@@ -215,6 +215,134 @@
       pointer-events: none;
       z-index: 9999;
     }
+
+    /* PYTHON COACH COMPONENT STYLES */
+    .coach-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .coach-chip {
+      background: rgba(168, 85, 247, 0.12);
+      color: var(--purple-light);
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      border-radius: 9999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .coach-chip:hover {
+      background: rgba(168, 85, 247, 0.25);
+      border-color: var(--lime);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+    .coach-mode-pill {
+      background: #150f2f;
+      color: #fff;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .coach-mode-pill:hover {
+      background: #23184a;
+      border-color: var(--lime);
+      color: var(--lime);
+    }
+    .coach-msg-coach {
+      background: #140e2d;
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 12.5px;
+      color: #e2e0f0;
+      line-height: 1.5;
+    }
+    .coach-msg-user {
+      background: linear-gradient(135deg, #7c3aed, #9333ea);
+      color: #ffffff;
+      border-radius: 12px 12px 2px 12px;
+      padding: 10px 14px;
+      font-size: 12.5px;
+      line-height: 1.45;
+      max-width: 85%;
+      margin-left: auto;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    }
+    .coach-code-block {
+      background: #090614;
+      border: 1px solid #231c42;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--lime);
+      margin: 8px 0;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      position: relative;
+    }
+    .coach-feedback-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 10.5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .coach-feedback-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+    .coach-feedback-btn.active {
+      background: rgba(163, 230, 53, 0.15);
+      border-color: var(--lime);
+      color: var(--lime);
+    }
+
+    /* RESPONSIVE DRAWER & LAYOUT */
+    @media (max-width: 900px) {
+      .workspace-grid {
+        grid-template-columns: 1fr !important;
+      }
+      .desktop-coach-col {
+        display: none !important;
+      }
+      .mobile-coach-fab {
+        display: flex !important;
+      }
+    }
+    @media (min-width: 901px) {
+      .mobile-coach-fab {
+        display: none !important;
+      }
+      #mobile-coach-drawer {
+        display: none !important;
+      }
+    }
   </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -430,7 +558,13 @@
       hintStep: 0, // 0: hidden, 1: small hint, 2: strong hint, 3: solution
       editorCode: '',
       terminalOutput: '',
-      testResults: []
+      testResults: [],
+      coachCollapsed: localStorage.getItem('forge_coach_collapsed') === 'true' || false,
+      coachDrawerOpen: false,
+      coachHintLevel: 1,
+      coachMessages: [],
+      latestError: null,
+      latestErrorCode: ''
     };
 
     // ==========================================
@@ -2683,7 +2817,7 @@
           </div>
 
           <!-- 3-COLUMN GYM WORKSPACE -->
-          <div style="display: grid; grid-template-columns: 370px 1fr 340px; gap: 18px; align-items: stretch; min-height: 640px;">
+          <div class="workspace-grid" style="display: grid; grid-template-columns: ${state.coachCollapsed ? '360px 1fr 48px' : '360px 1fr 370px'}; gap: 18px; align-items: stretch; min-height: 640px; transition: grid-template-columns 0.25s ease;">
             
             <!-- COLUMN 1: CHALLENGE & CONCEPT (LEFT) -->
             <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 18px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between;">
@@ -2809,62 +2943,179 @@
 
             </div>
 
-            <!-- COLUMN 3: BYTE BUDDY COMPANION (RIGHT) -->
-            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 18px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
-              <div>
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                    <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--lime);"></div>
-                    <span style="font-weight: 800; color: #fff; font-size: 14px;">byte buddy</span>
-                    <span style="background: rgba(168, 85, 247, 0.3); color: var(--purple-light); font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 4px;">BETA</span>
-                  </div>
-                  <span style="color: var(--text-dark); cursor: pointer;">•••</span>
+            <!-- COLUMN 3: PYTHON COACH (RIGHT DESKTOP) -->
+            ${state.coachCollapsed ? `
+              <!-- Collapsed Slim Tab -->
+              <div class="desktop-coach-col" onclick="toggleCoachCollapse()" style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 18px 8px; cursor: pointer; transition: all 0.2s;" title="Click to expand Python Coach">
+                <button class="btn-ghost" style="padding: 6px; border-radius: 8px; margin-bottom: 16px; border-color: rgba(168,85,247,0.4);">
+                  💬
+                </button>
+                <div style="writing-mode: vertical-rl; transform: rotate(180deg); font-size: 11px; font-weight: 800; letter-spacing: 2px; color: var(--lime); display: flex; align-items: center; gap: 8px;">
+                  <span>⚡ PYTHON COACH</span>
+                  <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--lime);"></span>
                 </div>
+              </div>
+            ` : `
+              <!-- Expanded Python Coach Panel -->
+              <div class="desktop-coach-col coach-panel" style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 18px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+                
+                <div>
+                  <!-- Header -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 10px; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <div class="animate-float" style="width: 28px; height: 28px; background: radial-gradient(circle, #f97316, #ec4899); border-radius: 50% 50% 40% 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(236,72,153,0.45);">
+                        <span style="font-size: 14px;">⚡</span>
+                      </div>
+                      <div>
+                        <div style="font-weight: 900; color: #fff; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+                          PYTHON COACH
+                          <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--lime);"></span>
+                        </div>
+                        <div style="font-size: 10.5px; color: var(--text-dark); font-family: var(--font-mono);">
+                          Day ${state.currentDay} · L${state.currentLessonIdx + 1}
+                        </div>
+                      </div>
+                    </div>
 
-                <div style="display: flex; justify-content: center; margin: 8px 0;">
-                  <div class="animate-float" style="width: 74px; height: 74px; background: radial-gradient(circle, #f97316, #ec4899); border-radius: 50% 50% 40% 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 25px rgba(236,72,153,0.45); position: relative;">
-                    <div style="position: absolute; width: 95px; height: 30px; border: 2px solid rgba(255,255,255,0.4); border-radius: 50%; transform: rotate(-20deg);"></div>
-                    <div style="display: flex; gap: 7px; margin-top: -6px;">
-                      <div style="width: 5px; height: 8px; background: #fff; border-radius: 3px;"></div>
-                      <div style="width: 5px; height: 8px; background: #fff; border-radius: 3px;"></div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                      <button onclick="clearCoachChat()" class="btn-ghost" style="padding: 4px 8px; font-size: 11px;" title="Clear conversation">
+                        🗑️
+                      </button>
+                      <button onclick="toggleCoachCollapse()" class="btn-ghost" style="padding: 4px 8px; font-size: 11px;" title="Collapse Panel">
+                        ─
+                      </button>
                     </div>
                   </div>
-                </div>
 
-                <div style="background: #191336; border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 14px; padding: 12px; margin-bottom: 12px;">
-                  <div id="buddy-speech-bubble" style="font-weight: 700; color: #ffffff; font-size: 13px; line-height: 1.4; margin-bottom: 4px;">
-                    Day ${state.currentDay} · ${lesson.title} 👀
+                  <!-- Quick Mode Buttons (From User Specification) -->
+                  <div style="background: #0f0a24; border: 1px solid rgba(168,85,247,0.25); border-radius: 12px; padding: 10px 12px; margin-bottom: 12px;">
+                    <div style="font-size: 11.5px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+                      <span>What part is confusing?</span>
+                      <span style="font-size: 10px; color: var(--lime); font-family: var(--font-mono);">ACTIVE MODES</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                      <button onclick="coachRequestMode('explain_error')" class="coach-mode-pill">
+                        <span>⚠️</span> Explain this error
+                      </button>
+                      <button onclick="coachRequestMode('explain_code')" class="coach-mode-pill">
+                        <span>🔍</span> Explain this code
+                      </button>
+                      <button onclick="coachRequestMode('hint')" class="coach-mode-pill">
+                        <span>💡</span> Give me a hint
+                      </button>
+                      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                        <button onclick="coachRequestMode('example')" class="coach-mode-pill" style="justify-content: center;">
+                          <span>🧪</span> Show example
+                        </button>
+                        <button onclick="coachRequestMode('solution')" class="coach-mode-pill" style="justify-content: center; border-color: rgba(249,115,22,0.4); color: var(--orange);">
+                          <span>⚔️</span> Reveal solution
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <p id="buddy-speech-sub" style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">
-                    ${activeChallenge.explanation}
-                  </p>
+
+                  <!-- Chat Transcript Area -->
+                  <div id="coach-messages-container" style="overflow-y: auto; display: flex; flex-direction: column; gap: 8px; max-height: 240px; min-height: 180px; padding-right: 4px; margin-bottom: 10px;">
+                    ${renderCoachMessagesHTML()}
+                  </div>
                 </div>
 
-                <div style="display: flex; gap: 8px; margin-bottom: 14px;">
-                  <button onclick="buddyExplain()" class="btn-ghost" style="flex: 1; justify-content: center; font-size: 11px; padding: 6px 8px;">
-                    explain this
-                  </button>
-                  <button onclick="buddyTinyHint()" class="btn-ghost" style="flex: 1; justify-content: center; font-size: 11px; padding: 6px 8px;">
-                    tiny hint
-                  </button>
+                <div>
+                  <!-- Suggested Prompt Chips -->
+                  <div style="display: flex; align-items: center; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 6px;">
+                    <button onclick="askCoachPrompt('Why does this loop stop at 5?')" class="coach-chip">
+                      Why does loop stop at 5?
+                    </button>
+                    <button onclick="askCoachPrompt('Explain this line in simpler words.')" class="coach-chip">
+                      Explain simpler
+                    </button>
+                    <button onclick="askCoachPrompt('How can I test my code?')" class="coach-chip">
+                      How to test?
+                    </button>
+                  </div>
+
+                  <!-- Chat Input Form -->
+                  <form onsubmit="handleCoachSubmit(event, 'desktop')" style="display: flex; gap: 8px; position: relative;">
+                    <input id="coach-user-input" type="text" placeholder="Ask a question or click a mode..." style="flex: 1; background: #0c081e; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 10px 12px; color: #fff; font-size: 12px; outline: none;">
+                    <button type="submit" class="btn-lime" style="padding: 8px 14px; font-size: 12px; border-radius: 10px;">
+                      Send
+                    </button>
+                  </form>
                 </div>
+
               </div>
-
-              <div>
-                <form onsubmit="handleBuddyChat(event)" style="position: relative;">
-                  <input id="buddy-input" type="text" placeholder="Ask Byte Buddy about this lesson..." style="width: 100%; background: #0e0a1f; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 10px 40px 10px 12px; color: #fff; font-size: 12px; outline: none;">
-                  <button type="submit" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--purple-light); cursor: pointer; font-size: 14px;">
-                    ➤
-                  </button>
-                </form>
-                <div style="text-align: center; font-size: 11px; color: var(--text-dark); margin-top: 6px;">
-                  YOU GOT THIS ⚡
-                </div>
-              </div>
-
-            </div>
+            `}
 
           </div>
+
+          <!-- MOBILE FULL-SCREEN DRAWER -->
+          <div id="mobile-coach-drawer" style="display: ${state.coachDrawerOpen ? 'flex' : 'none'}; position: fixed; inset: 0; z-index: 9999; background: rgba(12, 9, 22, 0.98); backdrop-filter: blur(16px); flex-direction: column; padding: 18px; overflow-y: auto;">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px; margin-bottom: 14px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="animate-float" style="width: 28px; height: 28px; background: radial-gradient(circle, #f97316, #ec4899); border-radius: 50% 50% 40% 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(236,72,153,0.5);">
+                  <span style="font-size: 14px;">⚡</span>
+                </div>
+                <div>
+                  <h3 style="font-weight: 900; color: #ffffff; font-size: 16px; margin: 0;">PYTHON COACH</h3>
+                  <div style="font-size: 11px; color: var(--lime); font-family: var(--font-mono);">
+                    Day ${state.currentDay} · ${lesson.title}
+                  </div>
+                </div>
+              </div>
+              <button onclick="toggleMobileCoachDrawer()" class="btn-ghost" style="padding: 8px 14px; font-size: 13px; font-weight: 800; border-color: rgba(255,255,255,0.2);">
+                ✕ Close
+              </button>
+            </div>
+
+            <!-- Mobile Quick Modes -->
+            <div style="background: #0f0a24; border: 1px solid rgba(168,85,247,0.25); border-radius: 12px; padding: 10px 12px; margin-bottom: 12px;">
+              <div style="font-size: 11.5px; font-weight: 800; color: var(--text-main); margin-bottom: 8px;">
+                What part is confusing?
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                <button onclick="coachRequestMode('explain_error')" class="coach-mode-pill">
+                  <span>⚠️</span> Explain error
+                </button>
+                <button onclick="coachRequestMode('explain_code')" class="coach-mode-pill">
+                  <span>🔍</span> Explain code
+                </button>
+                <button onclick="coachRequestMode('hint')" class="coach-mode-pill">
+                  <span>💡</span> Give me a hint
+                </button>
+                <button onclick="coachRequestMode('example')" class="coach-mode-pill">
+                  <span>🧪</span> Show example
+                </button>
+              </div>
+              <button onclick="coachRequestMode('solution')" class="coach-mode-pill" style="width: 100%; margin-top: 6px; justify-content: center; color: var(--orange); border-color: rgba(249,115,22,0.4);">
+                <span>⚔️</span> Reveal solution
+              </button>
+            </div>
+
+            <!-- Mobile Chat Messages -->
+            <div id="mobile-coach-messages-container" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; min-height: 240px;">
+              ${renderCoachMessagesHTML()}
+            </div>
+
+            <!-- Mobile Chips -->
+            <div style="display: flex; align-items: center; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 8px;">
+              <button onclick="askCoachPrompt('Why does this loop stop at 5?')" class="coach-chip">Why does loop stop at 5?</button>
+              <button onclick="askCoachPrompt('Explain this line in simpler words.')" class="coach-chip">Explain simpler</button>
+              <button onclick="askCoachPrompt('How can I test my code?')" class="coach-chip">How to test?</button>
+            </div>
+
+            <!-- Mobile Input -->
+            <form onsubmit="handleCoachSubmit(event, 'mobile')" style="display: flex; gap: 8px;">
+              <input id="mobile-coach-user-input" type="text" placeholder="Ask Python Coach a question..." style="flex: 1; background: #0c081e; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px; color: #fff; font-size: 13px; outline: none;">
+              <button type="submit" class="btn-lime" style="padding: 10px 18px; font-size: 13px; border-radius: 10px;">
+                Send
+              </button>
+            </form>
+          </div>
+
+          <!-- Mobile Floating Action Button -->
+          <button onclick="toggleMobileCoachDrawer()" class="mobile-coach-fab btn-lime" style="position: fixed; bottom: 20px; right: 20px; z-index: 60; box-shadow: 0 0 20px rgba(163,230,53,0.5); padding: 12px 20px; font-size: 13px; font-weight: 800; border-radius: 9999px; display: none; align-items: center; gap: 8px;">
+            <span>⚡</span> Python Coach
+          </button>
 
         </div>
       `;
@@ -2883,6 +3134,9 @@
       if (state.currentLessonIdx < lessons.length - 1) {
         state.currentLessonIdx++;
         state.hintStep = 0;
+        state.coachMessages = [];
+        state.coachHintLevel = 1;
+        state.latestError = null;
         saveProfile();
         renderWorkspace(document.getElementById('app-container'));
       } else {
@@ -2891,6 +3145,9 @@
           state.currentDay++;
           state.currentLessonIdx = 0;
           state.hintStep = 0;
+          state.coachMessages = [];
+          state.coachHintLevel = 1;
+          state.latestError = null;
           saveProfile();
           playSound('pass');
           triggerConfetti();
@@ -2910,12 +3167,18 @@
       if (state.currentLessonIdx > 0) {
         state.currentLessonIdx--;
         state.hintStep = 0;
+        state.coachMessages = [];
+        state.coachHintLevel = 1;
+        state.latestError = null;
         saveProfile();
         renderWorkspace(document.getElementById('app-container'));
       } else if (state.currentDay > 1) {
         state.currentDay--;
         state.currentLessonIdx = curriculum[state.currentDay].lessons.length - 1;
         state.hintStep = 0;
+        state.coachMessages = [];
+        state.coachHintLevel = 1;
+        state.latestError = null;
         saveProfile();
         renderWorkspace(document.getElementById('app-container'));
       }
@@ -2926,6 +3189,9 @@
       state.currentDay = dayNumber;
       state.currentLessonIdx = lessonIdx;
       state.hintStep = 0;
+      state.coachMessages = [];
+      state.coachHintLevel = 1;
+      state.latestError = null;
       saveProfile();
       navigateTo('workspace');
     }
@@ -2934,6 +3200,9 @@
       playSound('click');
       state.currentLessonIdx = lessonIdx;
       state.hintStep = 0;
+      state.coachMessages = [];
+      state.coachHintLevel = 1;
+      state.latestError = null;
       saveProfile();
       renderWorkspace(document.getElementById('app-container'));
     }
@@ -3405,8 +3674,11 @@
 
       if (result.success) {
         state.terminalOutput = `<span style="color: #a3e635;">${result.output}</span>`;
+        state.latestError = null;
       } else {
         playSound('fail');
+        state.latestError = result.error + (result.hint ? ' - ' + result.hint : '');
+        state.latestErrorCode = state.editorCode;
         state.terminalOutput = `
           <div style="color: #ef4444; margin-bottom: 8px;"><b>Traceback (most recent call last):</b><br>${result.error}</div>
           <div style="background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); border-radius: 8px; padding: 10px; color: #fca5a5;">
@@ -3448,12 +3720,17 @@
       if (isMatch) {
         playSound('pass');
         triggerConfetti();
+        state.latestError = null;
         state.solvedQuests.add(lesson.id);
         state.xp += 40;
         saveProfile();
         syncProfileUI();
       } else {
         playSound('fail');
+        state.latestError = result.success 
+          ? `Output mismatch: Expected "${active.expected.trim()}", but got "${result.output.trim()}"`
+          : (result.error + (result.hint ? ' - ' + result.hint : ''));
+        state.latestErrorCode = state.editorCode;
       }
     }
 
@@ -3504,39 +3781,599 @@
       }
     }
 
-    function buddyExplain() {
-      playSound('click');
-      const dayData = curriculum[state.currentDay];
-      const lesson = dayData.lessons[state.currentLessonIdx];
-      alert(`🤖 Byte Buddy Explanation:\n${lesson.conceptSummary}`);
+    // ==========================================
+    // PYTHON COACH: CHATBOT SERVICE & UI ENGINE
+    // Directly inside the coding workspace (collapsible on desktop, full-screen drawer on mobile)
+    // Only sends minimal context (lessonContext, question, userCode, latestError) - zero personal info!
+    // Includes: Hint, Explain my code, Explain my error, Show example, Reveal solution,
+    // and "This explanation didn't help" feedback option.
+    // ==========================================
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
 
-    function buddyTinyHint() {
-      playSound('click');
-      const dayData = curriculum[state.currentDay];
-      const lesson = dayData.lessons[state.currentLessonIdx];
-      const active = lesson[`tier${state.currentTier}`] || lesson.tier1;
-      alert(`🤖 Tiny Hint:\n${active.hint1 || active.explanation}`);
+    function formatCoachMarkdown(raw) {
+      if (!raw) return '';
+      let text = escapeHtml(raw);
+
+      // Markdown Headers
+      text = text.replace(/### (.*?)(?:\n|$)/g, '<div style="font-size: 13px; font-weight: 800; color: var(--lime); margin: 6px 0 4px 0;">$1</div>');
+      text = text.replace(/## (.*?)(?:\n|$)/g, '<div style="font-size: 14px; font-weight: 900; color: #fff; margin: 8px 0 4px 0;">$1</div>');
+
+      // Code blocks ```python ... ```
+      text = text.replace(/```(?:python)?\s*([\s\S]*?)```/g, (match, p1) => {
+        const clean = p1.trim();
+        const b64 = btoa(unescape(encodeURIComponent(clean)));
+        return `
+          <div class="coach-code-block">
+            <div style="display: flex; justify-content: flex-end; gap: 4px; margin-bottom: 6px;">
+              <button onclick="copyCodeToClipboard(this, '${b64}')" class="btn-ghost" style="padding: 2px 6px; font-size: 10px;">📋 Copy</button>
+              <button onclick="insertCodeIntoEditor('${b64}')" class="btn-ghost" style="padding: 2px 6px; font-size: 10px; border-color: var(--lime); color: var(--lime);">📥 Insert</button>
+            </div>
+            <code>${clean}</code>
+          </div>
+        `;
+      });
+
+      // Inline code `code`
+      text = text.replace(/`([^`]+)`/g, '<code style="background: rgba(168,85,247,0.2); color: var(--purple-light); padding: 1px 5px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px;">$1</code>');
+
+      // Bold **bold**
+      text = text.replace(/\*\*(.*?)\*\*/g, '<b style="color: #ffffff;">$1</b>');
+
+      // Italic *italic*
+      text = text.replace(/\*(.*?)\*/g, '<i style="color: var(--text-muted);">$1</i>');
+
+      // Bullet items - item
+      text = text.replace(/(?:^|\n)- (.*?)(?=\n|$)/g, '<div style="margin-left: 6px; display: flex; gap: 6px; margin-bottom: 2px;"><span style="color: var(--lime);">•</span><span>$1</span></div>');
+
+      // Line breaks
+      text = text.replace(/\n\n/g, '<div style="height: 6px;"></div>');
+      text = text.replace(/\n/g, '<br>');
+
+      return text;
     }
 
-    function handleBuddyChat(e) {
+    function renderCoachMessagesHTML() {
+      const dayData = curriculum[state.currentDay] || curriculum[1];
+      const lesson = dayData.lessons[state.currentLessonIdx] || dayData.lessons[0];
+
+      if (!state.coachMessages || state.coachMessages.length === 0) {
+        state.coachMessages = [
+          {
+            id: 'msg-welcome',
+            sender: 'coach',
+            text: `### 👋 Hey @${state.username}!\nI'm your **Python Coach**. I'm actively watching \`main.py\` and your test outputs for **${lesson.title}**.\n\nWhat part is confusing? Choose a help mode above or ask any question below!`,
+            suggestedNextStep: "Click 'Give me a hint' or 'Explain this code' if you want a walkthrough.",
+            timestamp: Date.now()
+          }
+        ];
+      }
+
+      return state.coachMessages.map(msg => {
+        if (msg.sender === 'user') {
+          return `
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 6px;">
+              <div class="coach-msg-user">
+                ${escapeHtml(msg.text)}
+              </div>
+            </div>
+          `;
+        }
+
+        const formattedBody = formatCoachMarkdown(msg.text);
+
+        return `
+          <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+            <div style="flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%; background: radial-gradient(circle, #f97316, #ec4899); display: flex; align-items: center; justify-content: center; font-size: 11px; margin-top: 2px;">
+              ⚡
+            </div>
+            <div class="coach-msg-coach" style="flex: 1;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 11px; color: var(--purple-light);">
+                <b>Python Coach</b>
+                <span style="font-size: 10px; color: var(--text-dark);">${new Date(msg.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+              </div>
+
+              <div>${formattedBody}</div>
+
+              ${msg.suggestedNextStep ? `
+                <div style="margin-top: 8px; padding: 6px 10px; background: rgba(163,230,53,0.08); border-left: 2px solid var(--lime); border-radius: 4px; font-size: 11.5px; color: #fff;">
+                  <b style="color: var(--lime);">👉 Next Step:</b> ${escapeHtml(msg.suggestedNextStep)}
+                </div>
+              ` : ''}
+
+              <!-- Feedback Controls (Helpful / This explanation didn't help) -->
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.06);">
+                <span style="font-size: 10.5px; color: var(--text-dark);">Was this helpful?</span>
+                <div style="display: flex; gap: 6px;">
+                  <button onclick="handleCoachFeedback('${msg.id}', 'helpful')" class="coach-feedback-btn ${msg.feedback === 'helpful' ? 'active' : ''}">
+                    👍 Helpful
+                  </button>
+                  <button onclick="handleCoachFeedback('${msg.id}', 'unhelpful')" class="coach-feedback-btn ${msg.feedback === 'unhelpful' ? 'active' : ''}">
+                    👎 This explanation didn't help
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function refreshCoachMessagesUI() {
+      const desktopC = document.getElementById('coach-messages-container');
+      const mobileC = document.getElementById('mobile-coach-messages-container');
+      const html = renderCoachMessagesHTML();
+      if (desktopC) desktopC.innerHTML = html;
+      if (mobileC) mobileC.innerHTML = html;
+    }
+
+    function scrollCoachToBottom() {
+      setTimeout(() => {
+        const containers = [
+          document.getElementById('coach-messages-container'),
+          document.getElementById('mobile-coach-messages-container')
+        ];
+        containers.forEach(c => {
+          if (c) c.scrollTop = c.scrollHeight;
+        });
+      }, 50);
+    }
+
+    function toggleCoachCollapse() {
+      playSound('click');
+      state.coachCollapsed = !state.coachCollapsed;
+      localStorage.setItem('forge_coach_collapsed', state.coachCollapsed);
+      renderWorkspace(document.getElementById('app-container'));
+    }
+
+    function toggleMobileCoachDrawer() {
+      playSound('click');
+      state.coachDrawerOpen = !state.coachDrawerOpen;
+      const drawer = document.getElementById('mobile-coach-drawer');
+      if (drawer) {
+        drawer.style.display = state.coachDrawerOpen ? 'flex' : 'none';
+        if (state.coachDrawerOpen) {
+          refreshCoachMessagesUI();
+          scrollCoachToBottom();
+        }
+      }
+    }
+
+    function clearCoachChat() {
+      playSound('click');
+      state.coachMessages = [];
+      refreshCoachMessagesUI();
+    }
+
+    function coachRequestMode(mode) {
+      let promptText = '';
+      if (mode === 'explain_error') promptText = 'What does this error mean and how do I fix it?';
+      else if (mode === 'explain_code') promptText = 'Explain my current code line by line in simpler words.';
+      else if (mode === 'hint') promptText = 'Can you give me a hint without showing the answer?';
+      else if (mode === 'example') promptText = 'Show me a short runnable example of this concept.';
+      else if (mode === 'solution') promptText = 'Please reveal the full solution for this challenge.';
+      sendCoachMessage(promptText, mode);
+    }
+
+    function askCoachPrompt(prompt) {
+      sendCoachMessage(prompt, 'general');
+    }
+
+    function handleCoachSubmit(e, source = 'desktop') {
       e.preventDefault();
-      playSound('click');
-      const input = document.getElementById('buddy-input');
+      const inputId = source === 'mobile' ? 'mobile-coach-user-input' : 'coach-user-input';
+      const input = document.getElementById(inputId);
       if (!input || !input.value.trim()) return;
-      const userText = input.value.trim().toLowerCase();
+      const text = input.value.trim();
       input.value = '';
+      sendCoachMessage(text, 'general');
+    }
+
+    async function sendCoachMessage(text, mode = 'general') {
+      if (!text || !text.trim()) return;
+      playSound('click');
+
+      // Append user message
+      state.coachMessages.push({
+        id: 'u-' + Date.now(),
+        sender: 'user',
+        text: text.trim(),
+        timestamp: Date.now()
+      });
+
+      refreshCoachMessagesUI();
+      scrollCoachToBottom();
 
       const dayData = curriculum[state.currentDay];
       const lesson = dayData.lessons[state.currentLessonIdx];
+      const tierKey = `tier${state.currentTier}`;
+      const active = lesson[tierKey] || lesson.tier1;
 
-      let reply = `In Day ${state.currentDay} (${dayData.title}), remember: ${lesson.conceptSummary}`;
-      if (userText.includes('leetcode')) reply = "Two Pointers, Sliding Window, and Hash Maps solve over 80% of entry-level LeetCode problems!";
-      else if (userText.includes('error') || userText.includes('bug')) reply = "Check the line Python pointed out. Remember TypeError usually means you passed a string where an int was expected!";
-      else if (userText.includes('next')) reply = "Click the 'Next Lesson →' button on the top right or bottom of the editor to advance!";
+      const editor = document.getElementById('python-editor');
+      const currentCode = editor ? editor.value : state.editorCode;
 
-      alert(`🤖 Byte Buddy says:\n${reply}`);
+      if (mode === 'hint') {
+        state.coachHintLevel = (state.coachHintLevel % 3) + 1;
+      } else {
+        state.coachHintLevel = 1;
+      }
+
+      // Typing indicator
+      const typingId = 'typing-' + Date.now();
+      state.coachMessages.push({
+        id: typingId,
+        sender: 'coach',
+        text: '⚡ *Analyzing your code & lesson context...*',
+        timestamp: Date.now()
+      });
+      refreshCoachMessagesUI();
+      scrollCoachToBottom();
+
+      try {
+        const response = await PythonCoachService.query({
+          mode,
+          question: text,
+          userCode: currentCode,
+          latestError: state.latestError,
+          lessonContext: {
+            day: state.currentDay,
+            title: lesson.title,
+            task: active.task,
+            conceptSummary: lesson.conceptSummary,
+            tier: state.currentTier,
+            hint1: active.hint1,
+            hint2: active.hint2,
+            expected: active.expected,
+            solution: active.code
+          },
+          hintLevel: state.coachHintLevel
+        });
+
+        state.coachMessages = state.coachMessages.filter(m => m.id !== typingId);
+
+        let codeSnippet = response.exampleCode || null;
+        if (!codeSnippet && response.reply && response.reply.includes('```python')) {
+          const match = response.reply.match(/```python\s*([\s\S]*?)```/);
+          if (match) codeSnippet = match[1].trim();
+        }
+
+        state.coachMessages.push({
+          id: 'c-' + Date.now(),
+          sender: 'coach',
+          text: response.reply,
+          suggestedNextStep: response.suggestedNextStep || null,
+          codeSnippet: codeSnippet,
+          mode: mode,
+          timestamp: Date.now()
+        });
+      } catch (err) {
+        state.coachMessages = state.coachMessages.filter(m => m.id !== typingId);
+        state.coachMessages.push({
+          id: 'c-' + Date.now(),
+          sender: 'coach',
+          text: "### 🤖 Python Coach Context\nI'm ready to assist with your code. Click 'Give me a hint' or 'Explain this code' to inspect your current lesson!",
+          suggestedNextStep: "Try running your code or ask a question.",
+          timestamp: Date.now()
+        });
+      }
+
+      refreshCoachMessagesUI();
+      scrollCoachToBottom();
     }
+
+    function handleCoachFeedback(msgId, rating) {
+      playSound('click');
+      const msg = state.coachMessages.find(m => m.id === msgId);
+      if (msg) {
+        msg.feedback = rating;
+      }
+
+      // Store feedback locally
+      const savedFeedback = JSON.parse(localStorage.getItem('forge_coach_feedback') || '[]');
+      savedFeedback.push({
+        msgId,
+        rating,
+        timestamp: Date.now(),
+        lessonId: curriculum[state.currentDay]?.lessons[state.currentLessonIdx]?.id
+      });
+      localStorage.setItem('forge_coach_feedback', JSON.stringify(savedFeedback));
+
+      // Report to /api/coach-feedback if server is running
+      try {
+        fetch('/api/coach-feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            msgId,
+            rating,
+            lessonId: curriculum[state.currentDay]?.lessons[state.currentLessonIdx]?.id,
+            mode: msg ? msg.mode : 'general'
+          })
+        }).catch(() => {});
+      } catch (e) {}
+
+      // If user flagged "This explanation didn't help", Coach immediately offers an alternative breakdown
+      if (rating === 'unhelpful') {
+        const dayData = curriculum[state.currentDay];
+        const lesson = dayData.lessons[state.currentLessonIdx];
+        const tierKey = `tier${state.currentTier}`;
+        const active = lesson[tierKey] || lesson.tier1;
+
+        setTimeout(() => {
+          state.coachMessages.push({
+            id: 'alt-' + Date.now(),
+            sender: 'coach',
+            text: `### 💡 Alternate Simpler Explanation\n\nThanks for letting me know that wasn't clear! Let's strip away all jargon:\n\n**The Goal:** Write Python code so that the output matches:\n\`\`\`\n${active.expected.trim()}\n\`\`\`\n\n**Core Idea:** *${active.hint1 || lesson.conceptSummary}*\n\nWould you like to inspect a 1-line runnable example, or see the full solution?`,
+            suggestedNextStep: "Click 'Show example' or 'Reveal solution' to see the exact syntax.",
+            timestamp: Date.now()
+          });
+          refreshCoachMessagesUI();
+          scrollCoachToBottom();
+        }, 300);
+      }
+
+      refreshCoachMessagesUI();
+    }
+
+    function copyCodeToClipboard(btn, b64) {
+      try {
+        const code = decodeURIComponent(escape(atob(b64)));
+        navigator.clipboard.writeText(code).then(() => {
+          const orig = btn.innerHTML;
+          btn.innerHTML = '✓ Copied!';
+          btn.style.color = 'var(--lime)';
+          setTimeout(() => {
+            btn.innerHTML = orig;
+            btn.style.color = '';
+          }, 1800);
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function insertCodeIntoEditor(b64) {
+      try {
+        const code = decodeURIComponent(escape(atob(b64)));
+        const editor = document.getElementById('python-editor');
+        if (editor) {
+          editor.value = code;
+          handleCodeInput(editor);
+          playSound('click');
+          alert('✓ Code inserted into editor!');
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // ==========================================
+    // PYTHON COACH CHAT SERVICE
+    // Client-side API orchestrator & resilient offline inference engine
+    // ==========================================
+    const PythonCoachService = {
+      async query({ mode, question, userCode, latestError, lessonContext, hintLevel = 1 }) {
+        const payload = {
+          mode,
+          question,
+          userCode: (userCode || '').slice(0, 2000),
+          latestError: (latestError || '').slice(0, 1000),
+          lessonContext: {
+            day: lessonContext.day,
+            title: lessonContext.title,
+            task: lessonContext.task,
+            concept: lessonContext.conceptSummary,
+            tier: lessonContext.tier,
+            hint1: lessonContext.hint1,
+            hint2: lessonContext.hint2,
+            expected: lessonContext.expected,
+            solution: lessonContext.solution
+          },
+          hintLevel
+        };
+
+        // Try calling the Node /api/chat service
+        try {
+          const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (res.ok) {
+            return await res.json();
+          }
+        } catch (e) {
+          // Fall through to offline local inference
+        }
+
+        return PythonCoachService.localInference(payload);
+      },
+
+      localInference({ mode, question, userCode, latestError, lessonContext, hintLevel = 1 }) {
+        const q = (question || '').toLowerCase().trim();
+        const code = (userCode || '').trim();
+        const error = (latestError || '').trim();
+        const ctx = lessonContext || {};
+
+        // 1. Solution Request
+        if (mode === 'solution' || q.includes('solution') || q.includes('show answer') || q.includes('reveal answer')) {
+          const solutionCode = ctx.solution || ctx.expected || '# Solution code';
+          return {
+            mode: 'solution',
+            reply: `### ⚔️ FULL SOLUTION REVEAL\n\nHere is a clean, idiomatic implementation for **${ctx.title || 'this challenge'}**:\n\n\`\`\`python\n${solutionCode}\n\`\`\`\n\n**Why it works:** ${ctx.concept || 'Follows idiomatic Python logic.'}\n\n⚠️ **Invitation:** Now that you've reviewed the reference solution, reset your editor and challenge yourself to type it out from memory, or modify it to handle an extra edge case!`,
+            suggestedNextStep: "Reset the editor and try typing the solution from memory, or adapt it with your own variable names."
+          };
+        }
+
+        // 2. Explain Error Request
+        if (mode === 'explain_error' || q.includes('error') || q.includes('traceback') || q.includes('bug') || q.includes('why is it failing')) {
+          if (error) {
+            let explanation = "";
+            let fixSnippet = "";
+            if (error.includes('TypeError')) {
+              explanation = "**TypeError** occurs when an operation is applied to incompatible types (like adding a string and an integer).";
+              fixSnippet = "age = 25\n# Fix: convert with str() or use an f-string\nprint(f'Age: {age}')";
+            } else if (error.includes('IndexError')) {
+              explanation = "**IndexError: list index out of range** occurs when you request an index that doesn't exist. Python lists are 0-indexed, so valid indices are `0` through `len(list) - 1`.";
+              fixSnippet = "items = ['a', 'b', 'c']\n# Last item is at index 2, not 3!\nprint(items[len(items) - 1])";
+            } else if (error.includes('KeyError')) {
+              explanation = "**KeyError** means Python looked for a dictionary key that does not exist.";
+              fixSnippet = "user = {'name': 'Alex'}\n# Safe access with .get() avoids KeyError:\nrole = user.get('role', 'guest')";
+            } else if (error.includes('SyntaxError')) {
+              explanation = "**SyntaxError** means Python couldn't parse the code. Check for missing colons (`:`) after `if`/`for`/`def`, unclosed quotes, or unbalanced parentheses `()`.";
+            } else if (error.includes('IndentationError')) {
+              explanation = "**IndentationError** happens when indentation levels are inconsistent. Python requires 4 spaces for each indented block.";
+            } else if (error.includes('ZeroDivisionError')) {
+              explanation = "**ZeroDivisionError** means the denominator was 0. Protect against it with a conditional guard or `try/except`.";
+              fixSnippet = "if count != 0:\n    avg = total / count\nelse:\n    avg = 0";
+            } else if (error.includes('Output mismatch') || error.includes('Expected')) {
+              explanation = "**Test Output Mismatch:** Your syntax executed without crashing, but the printed output didn't match the expected test case. Pay special attention to exact spacing, capital letters, or missing newline characters.";
+            } else {
+              explanation = `**Error Encountered:** \`${error}\`\nCheck the line number in the traceback and verify variable types and syntax.`;
+            }
+
+            return {
+              mode: 'explain_error',
+              reply: `### 🐞 Understanding Your Error\n\n${explanation}${fixSnippet ? `\n\n\`\`\`python\n${fixSnippet}\n\`\`\`` : ''}`,
+              suggestedNextStep: "Apply the adjustment in your editor and click [Run ▶] or [Check Tests ✓] to re-verify."
+            };
+          } else {
+            return {
+              mode: 'explain_error',
+              reply: `### ✅ No Unhandled Exceptions Detected\n\nYour code is running without crashing! If your test isn't passing yet:\n1. Check the **🧪 Test Cases** tab to compare your output with the expected format.\n2. Ensure there are no extra leading/trailing spaces.\n3. Make sure you printed what the task requested.`,
+              suggestedNextStep: "Click 'Check Tests ✓' to inspect the exact test case differences."
+            };
+          }
+        }
+
+        // 3. Explain Code Request
+        if (mode === 'explain_code' || q.includes('explain this code') || q.includes('explain my code') || q.includes('what does this code do') || q.includes('explain this line')) {
+          let breakdown = [];
+          if (code.includes('range(')) {
+            breakdown.push("- **`range(start, stop)`**: Generates numbers starting at `start` and ending *strictly before* `stop`. The upper bound is exclusive!");
+          }
+          if (code.includes('for ') && code.includes(' in ')) {
+            breakdown.push("- **`for item in sequence:`**: Loops through each element in the iterable one by one, binding it to the loop variable.");
+          }
+          if (code.includes('while ')) {
+            breakdown.push("- **`while condition:`**: Continues repeating as long as the condition evaluates to `True`. Make sure the condition eventually becomes `False` to prevent an infinite loop!");
+          }
+          if (code.includes('print(')) {
+            breakdown.push("- **`print()`**: Sends output to stdout. `sep=` defines what goes between arguments, and `end=` defines the trailing character (default is `\\n`).");
+          }
+          if (code.includes('def ')) {
+            breakdown.push("- **`def func_name(...)`**: Defines a reusable function block with parameters and an optional `return` value.");
+          }
+          if (code.includes('//') || code.includes('%')) {
+            breakdown.push("- **`//` and `%`**: `//` performs integer division (flooring the quotient), while `%` returns the remainder modulo.");
+          }
+          if (code.includes('left') && code.includes('right')) {
+            breakdown.push("- **Two Pointers (`left < right`)**: Converges indices from both ends in $O(N)$ time, common in palindrome verification and array reversals.");
+          }
+
+          const explanation = breakdown.length > 0 
+            ? breakdown.join('\n')
+            : `- **Core Action:** ${ctx.concept || 'Executes sequential Python statements according to control flow.'}`;
+
+          return {
+            mode: 'explain_code',
+            reply: `### 🔍 Line-by-Line Breakdown\n\nHere is how Python interprets your current code:\n\n${explanation}\n\n**Current Task Context:** *${ctx.task || 'Follow the lesson instructions.'}*`,
+            suggestedNextStep: "Try running the code and inspecting each value in the output terminal."
+          };
+        }
+
+        // 4. Progressive Hint Request
+        if (mode === 'hint' || q.includes('hint') || q.includes('nudge') || q.includes('clue') || q.includes('stuck')) {
+          if (hintLevel === 1) {
+            return {
+              mode: 'hint',
+              hintLevel: 1,
+              reply: `### 💡 Gentle Nudge (Hint 1)\n\nTake a look at the goal: *${ctx.task || 'Solve the challenge.'}*\n\n**Key Concept:** ${ctx.concept || 'Review the lesson topic.'}\n\n🤔 *Predict before running:* What built-in parameter or function does Python provide for this? Ask yourself what happens if you test with a small input first!`,
+              suggestedNextStep: "Try testing your idea in the editor. Need a stronger hint? Click 'Give me a hint' again!"
+            };
+          } else if (hintLevel === 2) {
+            return {
+              mode: 'hint',
+              hintLevel: 2,
+              reply: `### 💡 Structural Pattern (Hint 2)\n\nHere is the exact structural pattern you need:\n\n\`\`\`python\n${ctx.hint2 || ctx.hint1 || '# Use the appropriate Python keyword or function here'}\n\`\`\`\n\nNotice how the syntax aligns with the expected output format.`,
+              suggestedNextStep: "Fill in the specific values into this pattern in your editor and click [Run ▶]."
+            };
+          } else {
+            return {
+              mode: 'hint',
+              hintLevel: 3,
+              reply: `### 💡 Detailed Walkthrough (Hint 3)\n\nHere is the exact assembly:\n\n${ctx.concept || 'Assemble the variables and function calls as specified.'}\n\nIf you want to inspect the exact reference solution, ask for the full solution!`,
+              suggestedNextStep: "Give it one more attempt, or click 'Reveal solution' if you want to inspect the reference code."
+            };
+          }
+        }
+
+        // 5. Example Request
+        if (mode === 'example' || q.includes('example') || q.includes('sample') || q.includes('demo')) {
+          let exampleCode = "";
+          if (ctx.day === 1) {
+            exampleCode = "# Formatting print delimiters\nprint('Python', 'Forge', sep=' · ', end=' ⚡\\n')\n# Output: Python · Forge ⚡";
+          } else if (ctx.day === 2) {
+            exampleCode = "# Iterating with range(start, stop)\nfor n in range(1, 6):\n    print(f'Step {n}')\n# Stops strictly before 6!";
+          } else if (ctx.day === 3) {
+            exampleCode = "# Safe dictionary lookup\nuser_scores = {'alice': 95, 'bob': 88}\nprint(user_scores.get('charlie', 0)) # Returns 0 instead of crashing!";
+          } else if (ctx.day === 4) {
+            exampleCode = "# Pure function with default parameters\ndef calculate_tax(amount, rate=0.08):\n    return round(amount * rate, 2)\n\nprint(calculate_tax(100)) # 8.0";
+          } else if (ctx.day === 5) {
+            exampleCode = "# Safe file handling with context manager\n# with open('data.txt', 'w') as f:\n#     f.write('Safe write!')";
+          } else if (ctx.day === 6) {
+            exampleCode = "# Class definition and self binding\nclass Hero:\n    def __init__(self, name):\n        self.name = name\n    def shout(self):\n        return f'{self.name} enters the forge!'\n\nh = Hero('Kael')\nprint(h.shout())";
+          } else {
+            exampleCode = "# Two Pointers convergence pattern\ndef is_palindrome(s):\n    left, right = 0, len(s) - 1\n    while left < right:\n        if s[left] != s[right]:\n            return False\n        left += 1\n        right -= 1\n    return True\n\nprint(is_palindrome('racecar')) # True";
+          }
+
+          return {
+            mode: 'example',
+            reply: `### 🧪 Runnable Example Pattern\n\nHere is an example illustrating the underlying concept:\n\n\`\`\`python\n${exampleCode}\n\`\`\`\n\nNotice how this pattern separates the logic cleanly. You can apply this exact structure to your challenge!`,
+            suggestedNextStep: "Observe the pattern above and translate it to your task in the editor."
+          };
+        }
+
+        // 6. Specific natural language questions
+        if (q.includes('stop at 5') || q.includes('stops at 5') || q.includes('why 5') || (q.includes('range') && q.includes('stop'))) {
+          return {
+            mode: 'general',
+            reply: `### 🔢 Why \`range(1, 6)\` Stops at 5\n\nIn Python, \`range(start, stop)\` uses a **half-open interval**: \`[start, stop)\`.\n\n* **\`start\` (1)** is **inclusive** (included).\n* **\`stop\` (6)** is **exclusive** (excluded)!\n\nSo \`range(1, 6)\` generates: \`1, 2, 3, 4, 5\`.\n\n💡 **Why Python does this:**\n1. The length is always \`stop - start\` (e.g. \`6 - 1 = 5\` items).\n2. It prevents off-by-one errors when slicing lists (\`list[0:5]\` cleanly grabs the first 5 elements).`,
+            suggestedNextStep: "Try changing range(1, 6) to range(1, 7) in your editor and click Run ▶ to see 6 printed!"
+          };
+        }
+
+        if (q.includes('simpler') || q.includes('simple words') || q.includes('eli5')) {
+          return {
+            mode: 'general',
+            reply: `### 🌟 Simplified Concept\n\nThink of this lesson like following a simple recipe:\n1. **Input:** You give Python ingredients (variables, numbers, or text strings).\n2. **Execution:** Python reads your instructions from top to bottom, one line at a time.\n3. **Output:** Python prints the result to your terminal screen.\n\nIn this challenge (*${ctx.title || 'current lesson'}*), focus strictly on what the task asks you to print. Don't worry about extra complexity!`,
+            suggestedNextStep: "Write one simple line in the editor and click [Run ▶] to see what happens."
+          };
+        }
+
+        if (q.includes('how can i test') || q.includes('how to test') || q.includes('test my code')) {
+          return {
+            mode: 'general',
+            reply: `### 🧪 How to Test Your Code in Python Forge\n\n1. **Quick Test:** Click the green **Run ▶** button (or press \`Ctrl + Enter\`). This executes your code in the \`>_ Output\` terminal immediately.\n2. **Inspect Variables:** Add temporary \`print()\` statements inside your code to inspect variables at critical lines.\n3. **Automated Verification:** Click the purple **Check Tests ✓** button to compare your output against the exact test case expectations.`,
+            suggestedNextStep: "Click 'Check Tests ✓' to see if your current solution passes the automated test suite."
+          };
+        }
+
+        return {
+          mode: 'general',
+          reply: `### 🤖 Python Coach Context\n\nWe are currently in **Day ${ctx.day || 1}: ${ctx.title || 'Python Foundations'}**.\n\n**Task:** *${ctx.task || 'Write Python code to solve this challenge.'}*\n\n**Concept Summary:** ${ctx.concept || 'Focus on understanding the syntax and inspecting outputs.'}\n\nWhat would you like to explore? You can ask:\n- *"Why does this loop stop at 5?"*\n- *"What does this error mean?"*\n- *"Give me a hint without showing the answer"*\n- Or click one of the quick mode buttons above!`,
+          suggestedNextStep: "Click [Give me a hint] or type a specific question about your code."
+        };
+      }
+    };
 
     function loadProject(type) {
       if (type === 'quiz') selectDayAndLesson(1, 5);

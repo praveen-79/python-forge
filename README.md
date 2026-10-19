@@ -43,13 +43,21 @@ Each day includes 6 focused lessons, and every lesson provides 3 tiers of master
 
 ## ✨ Features & Architecture
 
-* **🎮 Cyberpunk Gym UI:** Dark obsidian theme (`#0c0916`), neon lime accents, retro CRT illustrations, and authentic hand-drawn sticker doodles.
+* **🤖 Python Coach (Embedded Workspace Chatbot):** Sits directly inside the coding gym beside your editor (collapsible on desktop, full-screen drawer on mobile) so learners never lose lesson focus.
+  * **5 Help Modes:**
+    * `[ 💡 Give me a hint ]`: 3-tier progressive nudges (subtle hint $\to$ structural pattern $\to$ guided walkthrough).
+    * `[ 🔍 Explain my code ]`: Line-by-line breakdown of loops, range boundaries, slicing, and functions.
+    * `[ ⚠️ Explain this error ]`: Human-translated error diagnostics for `TypeError`, `IndexError`, `KeyError`, and test assertion mismatches.
+    * `[ 🧪 Show an example ]`: Runnable, minimal code patterns demonstrating the core concept.
+    * `[ ⚔️ Reveal solution ]`: Labeled reference solution with an invitation to re-type from memory or modify for edge cases.
+  * **Privacy-First Minimal Context:** Only sends necessary task context (`userCode`, `latestError`, active challenge title); zero personal or account information is transmitted.
+  * **Continuous Improvement Feedback:** Every reply features `[ 👍 Helpful ]` and `[ 👎 This explanation didn't help ]` buttons with automatic simpler re-explanations.
+* **🎮 Cyberpunk Gym UI:** Dark obsidian theme (`#0c0916`), neon lime accents, retro CRT illustrations, and authentic pixel graffiti stickers.
 * **⏱️ Precision Telemetry HUD:** Live timer with **60-second idle filter** (measures only active typing/running time) and dynamic velocity tracker against the $6.2\text{m/task}$ benchmark.
 * **🐞 Error-First Deconstruction:** Human-translated diagnostic hints whenever code crashes (`TypeError`, `IndexError`, `KeyError`, `ZeroDivisionError`).
-* **🤖 Byte Buddy (AI Companion):** Floating cosmic flame sidekick providing contextual line-by-line explanations, hints, and an interactive chat box.
 * **🔊 Retro 8-Bit Web Audio SFX:** Synthesized arcade chimes for test passes, error alerts, and XP gains.
 * **🎊 Canvas Confetti Celebration:** Full-screen particle bursts on completed challenges.
-* **⚡ Zero Server Cost & 100% Offline:** Fully self-contained single-page application runnable from any browser with zero installation.
+* **⚡ Hybrid Architecture & 100% Offline Resilient:** Connects to Node.js Application API (`/api/chat`) when running locally, and seamlessly falls back to client-side inference on static hosts (like GitHub Pages) or offline `file://`.
 
 ---
 
