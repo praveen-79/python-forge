@@ -2,7 +2,8 @@
 echo ========================================================
 echo   PUSHING PYTHON FORGE TO GITHUB
 echo ========================================================
-echo.
+git add .
+git commit -m "feat: complete 42-lesson 7-day path with next/prev buttons, progressive hints, and LeetCode foundations"
 git push -u origin main
 echo.
 if %ERRORLEVEL% EQU 0 (

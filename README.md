@@ -22,17 +22,22 @@ Unlike traditional courses filled with passive videos and boring slides, every s
 
 ---
 
-## 🗺️ 7-Day Curriculum Structure
+## 🗺️ 7-Day Curriculum Structure (42 Practical Lessons · 126 Challenges)
 
-| Day | Focus | Core Patterns | Capstone Project |
-| :---: | :--- | :--- | :--- |
-| **Day 1** | **First Lines** | Variables, `sep=`, `end=`, f-strings, type casting traps | **Terminal Quiz Engine** |
-| **Day 2** | **Loop Mode** | `for`, `while`, `range()`, loop boundaries, break/continue | **Number Guessing Duel** |
-| **Day 3** | **Data Party** | Lists, $O(1)$ Hash Maps, dict `.get()`, Set deduplication | **Memory Contact Book** |
-| **Day 4** | **Function Energy** | Pure functions, return values, recursion base cases, scope | **Pocket Todo Engine** |
-| **Day 5** | **File Explorer** | `try / except`, `ZeroDivisionError`, JSON serialization | **Save-and-Load Tracker** |
-| **Day 6** | **Mini Project** | OOP, classes, `self`, LeetCode `ListNode` pointer linking | **Inventory Adventure Engine** |
-| **Day 7** | **Showtime!** | **Two Pointers Pattern**, `while left < right:`, LeetCode Two Sum | **LeetCode Arena** |
+Each day includes 6 focused lessons, and every lesson provides 3 tiers of mastery:
+- **Tier 1: Pattern Build** — Replicate and understand the idiomatic pattern.
+- **Tier 2: Bug Hunt 🐞** — Spot and fix real-world anti-patterns and runtime traps.
+- **Tier 3: Blank Screen (LeetCode Mini) ⚔️** — Solve without scaffolding to solidify problem-solving intuition.
+
+| Day | Title | Topics & Core Patterns | Lessons |
+| :---: | :--- | :--- | :---: |
+| **Day 1** | **Python Foundations** | `print()` separators & delimiters (`sep=`, `end=`), dynamic typing & memory swap, integer division (`//` & `%`), string slicing & f-strings, input casting traps (`int()`, `float()`), interactive quiz project. | 6 |
+| **Day 2** | **Logic & Repetition** | Truthiness & short-circuit evaluation (`and`/`or`), conditional chains, `range()` bounds & strides, `while` loops & sentinel flags, `enumerate()` & `zip()`, `for...else` search pattern. | 6 |
+| **Day 3** | **Collections & Data** | List mutability & boundary traps, tuples & starred unpacking (`*rest`), dictionaries & $O(1)$ hash map `.get()`, sets & hash-table deduplication, list/dict comprehensions, in-place two-pointer reversal. | 6 |
+| **Day 4** | **Functions & Reusability** | Pure functions & boolean simplification, default arguments (`*args`, `**kwargs`), LEGB variable scope, recursion base cases, standard library (`collections.Counter`), lambdas & custom `key=` sorting. | 6 |
+| **Day 5** | **Real-World Data & Errors** | Exception hierarchy (`try/except/else/finally`), defensive validation & `raise`, `pathlib.Path`, context managers (`with open`), JSON serialization, persistent expense tracker. | 6 |
+| **Day 6** | **Object-Oriented Programming** | Classes & `self` instance binding, dunder methods (`__str__`, `__repr__`), DSA `ListNode` pointer linking, modern `@dataclass` & type hints, generators & `yield`, `unittest` assertions. | 6 |
+| **Day 7** | **The LeetCode Arena & Beyond** | Two Pointers opposite direction (Valid Palindrome), Fast & Slow pointers (Move Zeroes), Fixed Sliding Window sum, Hash map complement search (LeetCode #1 Two Sum), virtual environments (`venv`, PEP 8), Concurrency (`asyncio`) & advanced tracks. | 6 |
 
 ---
 
