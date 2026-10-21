@@ -15,7 +15,7 @@
       cursor: pointer;
       transition: all 0.15s ease;
     }
-    .lc-btn-subtle:hover {
+    .lc-btn-subtle:hover:not(:disabled) {
       background: #282828;
       color: #fff;
       border-color: #444;
@@ -28,7 +28,7 @@
       cursor: pointer;
       transition: all 0.15s ease;
     }
-    .lc-btn-secondary:hover {
+    .lc-btn-secondary:hover:not(:disabled) {
       background: #383838;
     }
     .lc-btn-primary {
@@ -39,7 +39,7 @@
       cursor: pointer;
       transition: all 0.15s ease;
     }
-    .lc-btn-primary:hover {
+    .lc-btn-primary:hover:not(:disabled) {
       filter: brightness(1.1);
     }
     .lc-tab-btn {
@@ -60,6 +60,18 @@
     .lc-tab-btn.active {
       color: #fff;
       background: #2a2a2a;
+    }
+    .lc-step-pill {
+      flex: 1;
+      min-width: 90px;
+      padding: 6px 4px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: center;
+      white-space: nowrap;
+      transition: all 0.15s ease;
     }
     .lc-root * {
       box-sizing: border-box;
@@ -84,6 +96,16 @@
     testOutputText: '',
     collapsedSidebar: false
   };
+
+  const stepsConfig = [
+    { step: 1, label: 'Comprehension', fullLabel: 'Problem Comprehension & Invariants' },
+    { step: 2, label: 'Strategy', fullLabel: 'Formulate Algorithmic Strategy' },
+    { step: 3, label: 'Review & Trace', fullLabel: 'Mentor Evaluation & Visual Trace' },
+    { step: 4, label: 'Implementation', fullLabel: 'Python Implementation Blueprint' },
+    { step: 5, label: 'Test & Review', fullLabel: 'Code Review & Automated Testing' },
+    { step: 6, label: 'Optimal Big-O', fullLabel: 'Optimal Solution & Big-O Proof' },
+    { step: 7, label: 'Mastery Recap', fullLabel: 'Pattern Mastery & Interview Insights' }
+  ];
 
   // Helper to get problem by ID
   function getProblem(id) {
@@ -125,6 +147,111 @@
         if (typeof window.syncProfileUI === 'function') window.syncProfileUI();
       }
     }
+  }
+
+  // Helper: Escape HTML
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  // Helper: Pattern Philosophy Explanations
+  function getPatternPhilosophy(patId, patName) {
+    const philosophies = {
+      1: "In a sorted collection, opposite-end pointers eliminate an entire row or column of brute-force candidate pairs in single step. Because elements are sorted monotonically, if sum < target, no element left of 'right' can possibly sum with 'left' to reach target. Thus left += 1 safely discards O(N) candidates in a single step without testing them, turning O(N²) quadratic work into strict O(N) linear time.",
+      2: "Sliding Window maintains a running contiguous state over [start, end]. Instead of recomputing sums or character frequencies from scratch (O(N·K) or O(N²)), we add arr[end] upon expanding right, and subtract arr[start] when contracting left upon violating constraints. Each element enters and exits the window at most once, guaranteeing strict O(N) time.",
+      3: "Floyd's Tortoise & Hare algorithm sets slow moving by 1 node and fast moving by 2 nodes. If a cycle exists, each iteration reduces the relative gap between them by 1 node (2 - 1 = 1). They are mathematically guaranteed to meet within N iterations, detecting loops or middle nodes in O(N) time with zero extra heap memory (O(1) space).",
+      4: "Sorting intervals by start time (O(N log N)) ensures all overlapping intervals appear consecutively. We iterate sequentially and check: if current.start <= previous.end, they overlap, so we merge by setting previous.end = max(previous.end, current.end). Otherwise, we push the interval as a disjoint span.",
+      5: "When inputs contain N numbers in the range [1...N] (or [0...N]), every number belongs at index 'num - 1'. By swapping mismatched elements directly to their home indices, each number is placed in at most 2 swaps, yielding O(N) time and O(1) auxiliary space without extra boolean arrays.",
+      6: "Maintains 3 pointers: 'prev', 'curr', and 'next_node'. In each iteration, we save next_node = curr.next, redirect curr.next = prev, and advance prev = curr and curr = next_node. Reverses the pointers in-place with zero memory allocation.",
+      7: "Uses a double-ended FIFO queue (collections.deque). At each tree depth, captures level_size = len(queue) and iterates exactly level_size times, processing the horizontal tier before children are queued. Ideal for level-order summaries, zigzag paths, and vertical orderings.",
+      8: "Explores recursively down branches until base cases (not root or leaf) are met. Exploits the call stack to accumulate path sums, subtree depths, or path constructions, backtracking seamlessly upon return in O(N) time.",
+      9: "Partitions dynamic streaming data into two halves: a Max-Heap for the smaller half and a Min-Heap for the larger half. By maintaining balanced sizes (differing by at most 1), the median is retrieved in O(1) time while insertions take O(log N).",
+      10: "Backtracking builds solution paths incrementally via state choices: Choose candidate -> Explore recursions -> Unchoose (backtrack with path.pop()). Pruning invalid decisions early drastically trims combinatorial search trees.",
+      11: "Calculates mid = (low + high) // 2. In sorted, rotated, or bitonic arrays, at least one half [low...mid] or [mid...high] is strictly sorted. By checking boundary values, we discard half the search space in each step, achieving logarithmic O(log N) runtime.",
+      12: "Instead of sorting the entire array in O(N log N), maintains a Min-Heap of size K. When an incoming element exceeds the root, we pop the root and push the new element in O(log K). The final heap holds the top K largest elements in O(N log K) time and O(K) space.",
+      13: "Inserts the first element of each of the K sorted lists into a Min-Heap of size K. Repeatedly pops the overall smallest element, appends it to output, and pushes the next element from that stream in O(N log K) time with minimal memory.",
+      14: "0/1 Knapsack dynamic programming models states (index, capacity). At each item, we choose between excluding the item dp[i-1][w] or including it value[i] + dp[i-1][w - weight[i]]. Memoization eliminates redundant subproblem evaluations.",
+      15: "Models relations as vertices and edges. Employs a visited set to avoid cycles in BFS/DFS, or tracks in-degrees with a queue for Kahn's topological sort to resolve dependencies in O(V + E) time."
+    };
+    return philosophies[patId] || `The ${patName} pattern reduces exhaustive search spaces by exploiting structural properties of the input.`;
+  }
+
+  // Helper: Line-by-line explanation of solution code
+  function generateLineByLineExplanation(solution) {
+    if (!solution) return [];
+    const lines = solution.split('\n');
+    const explanations = [];
+
+    lines.forEach((rawLine, idx) => {
+      const line = rawLine.trim();
+      if (!line || line.startsWith('#')) return;
+
+      let exp = "Executes statement in the algorithmic flow.";
+      if (line.startsWith('def ')) {
+        exp = "Defines the core function signature with input parameters and expected return type.";
+      } else if (line.includes('left, right =') || line.includes('start, end =') || (line.includes('left =') && line.includes('right ='))) {
+        exp = "Initializes two boundary pointers: one at the start (index 0) and one at the end (index len-1).";
+      } else if (line.startsWith('while left < right:') || line.startsWith('while start < end:')) {
+        exp = "Loops while pointers have not met; guarantees every candidate pair is examined without duplicate checks.";
+      } else if (line.startsWith('while ') && line.includes('fast') && line.includes('next')) {
+        exp = "Loops while the fast pointer has valid forward nodes, guarding against null reference exceptions.";
+      } else if (line.startsWith('while ')) {
+        exp = "Controls the primary iteration invariant until boundary constraints are reached.";
+      } else if (line.startsWith('for ') && line.includes('range(')) {
+        exp = "Iterates across bounded index ranges sequentially.";
+      } else if (line.startsWith('for ') && line.includes(' in ')) {
+        exp = "Iterates over each element in the input collection.";
+      } else if (line.includes('current =') || line.includes('curr_sum =') || line.includes('current_sum =')) {
+        exp = "Computes the current candidate metric (sum, window size, or difference) in O(1) time.";
+      } else if (line.includes('if current == target:') || line.includes('if curr_sum == target:')) {
+        exp = "Condition satisfied! Returns the valid solution pair/indices immediately.";
+      } else if (line.includes('if ') && line.includes('< target') && line.includes('left +=')) {
+        exp = "Current sum is smaller than target. Because the array is sorted, incrementing left increases the sum monotonically.";
+      } else if (line.includes('right -= 1') || line.includes('end -= 1')) {
+        exp = "Current sum is larger than target. Decrementing right decreases the sum monotonically toward target.";
+      } else if (line.startsWith('if ') || line.startsWith('elif ')) {
+        exp = "Evaluates the algorithmic decision branch according to pattern invariants.";
+      } else if (line.startsWith('else:')) {
+        exp = "Default branch when alternative boundary conditions are not met.";
+      } else if (line.includes('return [') || line.includes('return True') || line.includes('return False') || line.includes('return max_') || line.includes('return res')) {
+        exp = "Returns the verified result matching problem specifications.";
+      } else if (line.startsWith('return [-1, -1]') || line.startsWith('return 0') || line.startsWith('return []')) {
+        exp = "Fallback return value when no valid element or subsegment satisfies the criteria.";
+      }
+
+      explanations.push({
+        lineNum: idx + 1,
+        code: line,
+        explanation: exp
+      });
+    });
+
+    return explanations;
+  }
+
+  // Helper: FAANG Interview Follow-Ups
+  function getFaangFollowUps(patId, prob) {
+    const common = [
+      {
+        q: "What if the input array is unsorted?",
+        a: "If elements are unsorted, you can either sort them first in O(N log N) time, or use a Hash Set/Map to trade O(N) space for O(N) time."
+      },
+      {
+        q: "How would you handle duplicate values in the input?",
+        a: "Advance your pointers past identical adjacent elements (e.g., while left < right and arr[left] == arr[left+1]: left += 1) to avoid duplicate answers."
+      },
+      {
+        q: "What if the dataset is a continuous stream that does not fit into RAM?",
+        a: "Use bounded data structures such as an external priority queue or sliding window buffers that process records in chunks without holding all elements in memory."
+      }
+    ];
+    return common;
   }
 
   // Render main LeetCode view
@@ -178,12 +305,12 @@
           </div>
 
           <div style="display: flex; align-items: center; gap: 12px;">
-            <!-- Prev / Next buttons -->
+            <!-- Prev / Next Problem buttons -->
             <button onclick="navigateLcProblem(-1)" class="lc-btn-subtle" style="padding: 4px 10px; font-size: 12px;" title="Previous Problem">
-              ‹ Prev
+              ‹ Prev Problem
             </button>
             <button onclick="navigateLcProblem(1)" class="lc-btn-subtle" style="padding: 4px 10px; font-size: 12px;" title="Next Problem">
-              Next ›
+              Next Problem ›
             </button>
             <div style="width: 1px; height: 18px; background: #333;"></div>
             <!-- Overall Progress Pill -->
@@ -342,17 +469,6 @@
     updateLcLineNumbers();
   };
 
-  // Helper: Escape HTML
-  function escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
-
   // Render Pattern Accordion in Left Sidebar
   function renderPatternAccordionHtml() {
     if (!window.LEETCODE_PATTERNS || !window.LEETCODE_PROBLEMS) {
@@ -456,74 +572,130 @@
     return renderSocraticMentorFlowHtml(prob);
   }
 
-  // 7-Step Socratic Mentoring Flow HTML
+  // Format problem description with code block highlights
+  function formatProblemDescription(text) {
+    if (!text) return '';
+    let out = escapeHtml(text);
+    out = out.replace(/(Example d+:)/g, '<b style="color: #ffffff; display: block; margin-top: 10px;">$1</b>');
+    out = out.replace(/(Input:)/g, '<span style="color: #ffc01e; font-weight: 600;">$1</span>');
+    out = out.replace(/(Output:)/g, '<span style="color: #00b8a3; font-weight: 600;">$1</span>');
+    out = out.replace(/(Constraints:)/g, '<b style="color: #ffffff; display: block; margin-top: 12px;">$1</b>');
+    return out;
+  }
+
+  // 7-Step Socratic Mentoring Flow HTML with detailed explanations and forward/backward controls
   function renderSocraticMentorFlowHtml(prob) {
-    const stepsConfig = [
-      { step: 1, label: 'Problem Comprehension' },
-      { step: 2, label: 'Formulate Approach' },
-      { step: 3, label: 'Mentor Review & Hints' },
-      { step: 4, label: 'Implementation' },
-      { step: 5, label: 'Code Review & Test' },
-      { step: 6, label: 'Optimal Solution & Big-O' },
-      { step: 7, label: 'Pattern Mastery Recap' }
-    ];
+    const curConfig = stepsConfig[lc.step - 1];
+    const prevConfig = lc.step > 1 ? stepsConfig[lc.step - 2] : null;
+    const nextConfig = lc.step < 7 ? stepsConfig[lc.step] : null;
 
     return `
-      <div style="display: flex; flex-direction: column; gap: 18px;">
+      <div style="display: flex; flex-direction: column; gap: 16px;">
         
+        <!-- TOP STEP NAVIGATION HEADER: PREV & NEXT BUTTONS -->
+        <div style="display: flex; align-items: center; justify-content: space-between; background: #1c1c1c; border: 1px solid #2d2d2d; border-radius: 8px; padding: 8px 12px;">
+          <button 
+            onclick="navigateLcStep(-1)" 
+            class="lc-btn-subtle" 
+            ${lc.step === 1 ? 'disabled style="opacity: 0.35; cursor: not-allowed; padding: 5px 12px; font-size: 12px;"' : 'style="padding: 5px 12px; font-size: 12px; font-weight: 600;"'}
+            title="${prevConfig ? 'Go back to Step ' + prevConfig.step + ': ' + prevConfig.label : 'Already at first step'}"
+          >
+            ‹ Prev Step
+          </button>
+          
+          <div style="text-align: center;">
+            <div style="font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.6px; color: #888;">Step ${lc.step} of 7</div>
+            <div style="font-size: 13px; font-weight: 700; color: #00b8a3;">${curConfig.fullLabel}</div>
+          </div>
+
+          <button 
+            onclick="navigateLcStep(1)" 
+            class="lc-btn-subtle" 
+            ${lc.step === 7 ? 'disabled style="opacity: 0.35; cursor: not-allowed; padding: 5px 12px; font-size: 12px;"' : 'style="padding: 5px 12px; font-size: 12px; font-weight: 600; color: #00b8a3; border-color: #00b8a340;"'}
+            title="${nextConfig ? 'Advance to Step ' + nextConfig.step + ': ' + nextConfig.label : 'Already at final step'}"
+          >
+            Next Step ›
+          </button>
+        </div>
+
+        <!-- 7 CLICKABLE STEP PILLS (FORWARD & BACKWARD JUMPING) -->
+        <div style="display: flex; gap: 4px; overflow-x: auto; padding-bottom: 2px;">
+          ${stepsConfig.map(s => {
+            const isCur = lc.step === s.step;
+            const isPast = lc.step > s.step;
+            return `
+              <button 
+                onclick="setLcStep(${s.step})" 
+                class="lc-step-pill"
+                style="border: 1px solid ${isCur ? '#3b82f6' : isPast ? '#00b8a340' : '#282828'}; background: ${isCur ? 'rgba(59,130,246,0.18)' : isPast ? 'rgba(0,184,163,0.08)' : '#181818'}; color: ${isCur ? '#60a5fa' : isPast ? '#00b8a3' : '#888'};"
+                title="Jump to Step ${s.step}: ${s.fullLabel}"
+              >
+                <span style="display: block; font-size: 9px; opacity: 0.85;">STEP ${s.step}</span>
+                ${s.label}
+              </button>
+            `;
+          }).join('')}
+        </div>
+
         <!-- Problem Description Card -->
-        <div style="background: #1e1e1e; border: 1px solid #2d2d2d; border-radius: 8px; padding: 18px;">
-          <h2 style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 12px;">
-            ${prob.id}. ${prob.title}
-          </h2>
-          <div style="font-size: 13.5px; line-height: 1.6; color: #d0d0d0; white-space: pre-line; margin-bottom: 14px;">
+        <div style="background: #1e1e1e; border: 1px solid #2d2d2d; border-radius: 8px; padding: 16px 18px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <h2 style="font-size: 17px; font-weight: 700; color: #fff;">
+              ${prob.id}. ${prob.title}
+            </h2>
+            <span style="font-size: 11px; color: #888; font-family: monospace;">Pattern: ${prob.patternName}</span>
+          </div>
+          <div style="font-size: 13.5px; line-height: 1.6; color: #d0d0d0; white-space: pre-line;">
             ${formatProblemDescription(prob.description)}
           </div>
         </div>
 
-        <!-- 7-STEP PROGRESS TRACKER BAR -->
-        <div style="background: #1c1c1c; border: 1px solid #2a2a2a; border-radius: 8px; padding: 10px 14px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-            <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #888;">
-              Socratic Mentoring Flow (Step ${lc.step} of 7)
-            </span>
-            <span style="font-size: 11.5px; font-weight: 600; color: #00b8a3;">
-              ${stepsConfig[lc.step - 1].label}
-            </span>
-          </div>
-
-          <div style="display: flex; gap: 4px;">
-            ${stepsConfig.map(s => {
-              const isPast = lc.step > s.step;
-              const isCur = lc.step === s.step;
-              const bg = isPast ? '#00b8a3' : isCur ? '#3b82f6' : '#2d2d2d';
-              return `
-                <div 
-                  onclick="setLcStep(${s.step})" 
-                  title="Step ${s.step}: ${s.label}" 
-                  style="flex: 1; height: 6px; background: ${bg}; border-radius: 3px; cursor: pointer; transition: background 0.2s;">
-                </div>
-              `;
-            }).join('')}
-          </div>
-        </div>
-
-        <!-- ACTIVE SOCRATIC STEP DIALOGUE -->
+        <!-- ACTIVE SOCRATIC STEP DIALOGUE CARD -->
         <div style="background: #1b1e24; border: 1px solid #283344; border-radius: 8px; padding: 18px;">
           
           <!-- Mentor Header -->
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
-            <div style="width: 32px; height: 32px; border-radius: 6px; background: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 16px;">
-              👨‍🏫
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #283344;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="width: 32px; height: 32px; border-radius: 6px; background: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                👨‍🏫
+              </div>
+              <div>
+                <div style="font-size: 13px; font-weight: 700; color: #fff;">LeetCode Socratic Mentor</div>
+                <div style="font-size: 11px; color: #8cb4ff;">${curConfig.fullLabel}</div>
+              </div>
             </div>
-            <div>
-              <div style="font-size: 13px; font-weight: 700; color: #fff;">LeetCode Socratic Mentor</div>
-              <div style="font-size: 11px; color: #8cb4ff;">Guiding you through pattern: ${prob.patternName}</div>
-            </div>
+
+            <!-- Step indicator badge -->
+            <span style="font-size: 11px; background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); font-weight: 700; padding: 3px 8px; border-radius: 12px;">
+              Step ${lc.step} / 7
+            </span>
           </div>
 
-          <!-- Dynamic Dialogue based on Step -->
+          <!-- Dynamic Detailed Dialogue Content based on Step -->
           ${renderCurrentStepDialogue(prob)}
+
+          <!-- BOTTOM STEP NAVIGATION FOOTER: PREV & NEXT BUTTONS -->
+          <div style="margin-top: 22px; padding-top: 14px; border-top: 1px solid #283344; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+            ${lc.step > 1 ? `
+              <button onclick="navigateLcStep(-1)" class="lc-btn-subtle" style="display: flex; align-items: center; gap: 6px; padding: 7px 14px; font-size: 12px; font-weight: 600;">
+                <span>‹</span> Previous: ${prevConfig ? prevConfig.label : 'Back'}
+              </button>
+            ` : `<div></div>`}
+
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <span style="font-size: 11.5px; color: #777;">Step ${lc.step} of 7</span>
+            </div>
+
+            ${lc.step < 7 ? `
+              <button onclick="navigateLcStep(1)" class="lc-btn-primary" style="display: flex; align-items: center; gap: 6px; padding: 7px 18px; font-size: 12.5px; font-weight: 700; background: #00b8a3; color: #000;">
+                Next: ${nextConfig ? nextConfig.label : 'Advance'} <span>›</span>
+              </button>
+            ` : `
+              <button onclick="navigateLcProblem(1)" class="lc-btn-primary" style="display: flex; align-items: center; gap: 6px; padding: 7px 18px; font-size: 12.5px; font-weight: 700; background: #00b8a3; color: #000;">
+                Next Problem in Pattern <span>›</span>
+              </button>
+            `}
+          </div>
 
         </div>
 
@@ -531,83 +703,140 @@
     `;
   }
 
-  // Format problem description with code block highlights
-  function formatProblemDescription(text) {
-    if (!text) return '';
-    let out = escapeHtml(text);
-    // Highlight Example headings
-    out = out.replace(/(Example \d+:)/g, '<b style="color: #ffffff; display: block; margin-top: 10px;">$1</b>');
-    out = out.replace(/(Input:)/g, '<span style="color: #ffc01e; font-weight: 600;">$1</span>');
-    out = out.replace(/(Output:)/g, '<span style="color: #00b8a3; font-weight: 600;">$1</span>');
-    out = out.replace(/(Constraints:)/g, '<b style="color: #ffffff; display: block; margin-top: 12px;">$1</b>');
-    return out;
-  }
-
-  // Render dialogue content for current Socratic step
+  // Render dialogue content for current Socratic step with deep explanations
   function renderCurrentStepDialogue(prob) {
+    const philosophy = getPatternPhilosophy(prob.patternId, prob.patternName);
+
+    // STEP 1: COMPREHENSION & INVARIANTS
     if (lc.step === 1) {
       return `
-        <div style="font-size: 13.5px; line-height: 1.6; color: #e2e8f0; margin-bottom: 14px;">
-          <p style="margin-bottom: 8px;">
-            <b>Step 1: Understand the Goal.</b> Let's examine what makes this problem unique.
-          </p>
-          <p style="color: #94a3b8; margin-bottom: 10px;">
-            Before jumping to code, take 30 seconds to re-read the examples and constraints above. What are the key inputs, the expected return type, and what naive (brute force) approach comes to mind first?
-          </p>
-        </div>
-        <div style="display: flex; gap: 8px;">
-          <button onclick="setLcStep(2)" class="lc-btn-primary" style="padding: 7px 16px; font-size: 12.5px; background: #2563eb;">
-            I Understand the Goal → Propose Approach
-          </button>
-          <button onclick="requestMentorClarification()" class="lc-btn-subtle" style="padding: 7px 14px; font-size: 12.5px;">
-            Explain the Goal in Simpler Words
-          </button>
-        </div>
-      `;
-    }
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 13.5px; line-height: 1.6; color: #e2e8f0;">
+          <div>
+            <b style="color: #fff; font-size: 14.5px;">Step 1: Deconstruct the Problem & Constraints</b>
+            <p style="color: #94a3b8; margin-top: 4px;">
+              Before writing code or jumping to algorithms, let's deconstruct what the problem demands and why simple brute force is unfeasible.
+            </p>
+          </div>
 
-    if (lc.step === 2) {
-      return `
-        <div style="font-size: 13.5px; line-height: 1.6; color: #e2e8f0; margin-bottom: 12px;">
-          <p style="margin-bottom: 8px;">
-            <b>Step 2: Propose Your Approach.</b> How can we solve this using the <b>${prob.patternName}</b> pattern?
-          </p>
-          <p style="color: #94a3b8; margin-bottom: 12px;">
-            Explain your strategy in words. How will you set up pointers, window bounds, heaps, or data structures? What is your condition to advance or terminate?
-          </p>
-          
-          <textarea 
-            id="lc-approach-input"
-            rows="4" 
-            placeholder="Type your intuition or algorithmic approach here (e.g. 'I will initialize two pointers at the ends and move them inward because the array is sorted...')"
-            style="width: 100%; background: #12151b; border: 1px solid #334155; border-radius: 6px; padding: 10px; color: #f1f5f9; font-size: 12.5px; font-family: sans-serif; resize: vertical; outline: none; margin-bottom: 12px;"
-          >${escapeHtml(lc.userApproach)}</textarea>
+          <!-- Deep-dive Input/Output Table -->
+          <div style="background: #14171d; border: 1px solid #283344; border-radius: 6px; padding: 12px 14px;">
+            <div style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; color: #60a5fa; margin-bottom: 6px; letter-spacing: 0.5px;">
+              📋 I/O Contract & Data Types
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12.5px;">
+              <div>
+                <span style="color: #888;">Function Signature:</span><br>
+                <code style="color: #ffc01e; font-family: 'JetBrains Mono', monospace;">${escapeHtml(prob.starterCode.split('\n')[0])}</code>
+              </div>
+              <div>
+                <span style="color: #888;">Target Efficiency:</span><br>
+                <b style="color: #00b8a3;">${prob.complexity}</b>
+              </div>
+            </div>
+          </div>
 
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button onclick="submitLcApproach()" class="lc-btn-primary" style="padding: 7px 18px; font-size: 12.5px; background: #2563eb;">
-              Submit Approach for Mentor Review
+          <!-- The Complexity Trap: Why Naive / Brute Force Fails -->
+          <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 6px; padding: 12px 14px;">
+            <div style="font-weight: 700; color: #f87171; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+              <span>⚠️ The Brute Force Complexity Trap</span>
+            </div>
+            <p style="color: #cbd5e1; font-size: 13px; margin: 0;">
+              A naive brute force approach (such as nested loops checking all combinations) requires <b>O(N²)</b> or <b>O(2ᴺ)</b> time.
+              With input lengths up to 10⁵, 10¹⁰ operations would take over 10 seconds in Python (where standard runtimes allow ~10⁷ operations/second).
+              Hence, nested loops will trigger a <b>Time Limit Exceeded (TLE)</b>.
+            </p>
+          </div>
+
+          <!-- Critical Mathematical Constraint -->
+          <div style="background: rgba(0, 184, 163, 0.08); border: 1px solid rgba(0, 184, 163, 0.25); border-radius: 6px; padding: 12px 14px;">
+            <div style="font-weight: 700; color: #00b8a3; margin-bottom: 4px;">
+              💡 The Core Constraint Clue
+            </div>
+            <p style="color: #cbd5e1; font-size: 13px; margin: 0;">
+              ${philosophy}
+            </p>
+          </div>
+
+          <!-- Action buttons -->
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px;">
+            <button onclick="navigateLcStep(1)" class="lc-btn-primary" style="padding: 7px 18px; font-size: 12.5px; background: #2563eb; color: #fff; font-weight: 600;">
+              Proceed to Step 2: Formulate Strategy →
             </button>
-            <button onclick="requestMentorHint()" class="lc-btn-subtle" style="padding: 7px 14px; font-size: 12.5px; color: #ffc01e;">
-              💡 Request a Nudge
-            </button>
-            <button onclick="revealIntuitionWalkthrough()" class="lc-btn-subtle" style="padding: 7px 14px; font-size: 12.5px;">
-              Explain Pattern Intuition
+            <button onclick="requestMentorClarification()" class="lc-btn-subtle" style="padding: 7px 14px; font-size: 12.5px;">
+              Explain in Simpler Terms
             </button>
           </div>
         </div>
       `;
     }
 
+    // STEP 2: FORMULATE STRATEGY
+    if (lc.step === 2) {
+      return `
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 13.5px; line-height: 1.6; color: #e2e8f0;">
+          <div>
+            <b style="color: #fff; font-size: 14.5px;">Step 2: Formulate Your Strategy (${prob.patternName})</b>
+            <p style="color: #94a3b8; margin-top: 4px;">
+              In an engineering interview, you should outline your strategy in plain words before typing code.
+            </p>
+          </div>
+
+          <!-- Strategy Blueprint Guide -->
+          <div style="background: #14171d; border: 1px solid #283344; border-radius: 6px; padding: 12px 14px;">
+            <div style="font-size: 12px; font-weight: 700; color: #ffc01e; text-transform: uppercase; margin-bottom: 6px;">
+              🧠 Strategic Blueprint for ${prob.patternName}:
+            </div>
+            <div style="font-size: 13px; color: #cbd5e1;">
+              • <b>1. State Variables:</b> What variables or pointers will you track from the start?<br>
+              • <b>2. Iteration Condition:</b> What invariant guards the while/for loop?<br>
+              • <b>3. Monotonic Decision:</b> When do you increment, decrement, expand, or shrink state?<br>
+              • <b>4. Termination & Fallback:</b> What do you return if no valid answer exists?
+            </div>
+          </div>
+
+          <!-- User input textarea -->
+          <div>
+            <label style="display: block; font-size: 11.5px; font-weight: 700; color: #8cb4ff; margin-bottom: 6px; text-transform: uppercase;">
+              Explain Your Approach in Your Own Words:
+            </label>
+            <textarea 
+              id="lc-approach-input"
+              rows="4" 
+              placeholder="e.g., I will initialize two pointers left=0 and right=len-1. Since the array is sorted, if arr[left] + arr[right] < target, I increment left to increase the sum..."
+              style="width: 100%; background: #12151b; border: 1px solid #334155; border-radius: 6px; padding: 10px; color: #f1f5f9; font-size: 12.5px; font-family: sans-serif; resize: vertical; outline: none;"
+            >${escapeHtml(lc.userApproach)}</textarea>
+          </div>
+
+          <!-- Controls -->
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button onclick="submitLcApproach()" class="lc-btn-primary" style="padding: 7px 18px; font-size: 12.5px; background: #2563eb; color: #fff; font-weight: 600;">
+              Submit Approach for Mentor Review
+            </button>
+            <button onclick="requestMentorHint()" class="lc-btn-subtle" style="padding: 7px 14px; font-size: 12.5px; color: #ffc01e;">
+              💡 Request a Nudge
+            </button>
+            <button onclick="revealIntuitionWalkthrough()" class="lc-btn-subtle" style="padding: 7px 14px; font-size: 12.5px;">
+              View Pattern Walkthrough
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // STEP 3: MENTOR EVALUATION & VISUAL TRACE
     if (lc.step === 3) {
       const feedback = lc.mentorFeedback || evaluateUserApproach(lc.userApproach, prob);
       return `
-        <div style="font-size: 13.5px; line-height: 1.6; color: #e2e8f0; margin-bottom: 14px;">
-          <p style="margin-bottom: 8px;">
-            <b>Step 3: Mentor Evaluation & Feedback.</b>
-          </p>
-          
-          <!-- Feedback Card -->
-          <div style="background: ${feedback.sound ? 'rgba(0,184,163,0.1)' : 'rgba(255,192,30,0.1)'}; border: 1px solid ${feedback.sound ? '#00b8a340' : '#ffc01e40'}; border-radius: 6px; padding: 12px 14px; margin-bottom: 14px;">
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 13.5px; line-height: 1.6; color: #e2e8f0;">
+          <div>
+            <b style="color: #fff; font-size: 14.5px;">Step 3: Mentor Review & Detailed Visual Trace</b>
+            <p style="color: #94a3b8; margin-top: 4px;">
+              Review the algorithmic critique below and trace through how the state evolves on the sample input.
+            </p>
+          </div>
+
+          <!-- Mentor Feedback Card -->
+          <div style="background: ${feedback.sound ? 'rgba(0,184,163,0.1)' : 'rgba(255,192,30,0.1)'}; border: 1px solid ${feedback.sound ? '#00b8a340' : '#ffc01e40'}; border-radius: 6px; padding: 12px 14px;">
             <div style="font-weight: 700; color: ${feedback.sound ? '#00b8a3' : '#ffc01e'}; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
               <span>${feedback.sound ? '✅ Approach Validated' : '💡 Mentor Guidance'}</span>
             </div>
@@ -616,149 +845,225 @@
             </div>
           </div>
 
+          <!-- Step-by-Step Visual Trace Card -->
+          <div style="background: #14171d; border: 1px solid #283344; border-radius: 6px; padding: 12px 14px;">
+            <div style="font-size: 11.5px; font-weight: 700; color: #60a5fa; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">
+              🔍 Step-by-Step Operational Trace
+            </div>
+            <div style="font-size: 13px; color: #cbd5e1; line-height: 1.5;">
+              <b>Core Invariant:</b> ${prob.approach}<br><br>
+              <b>Why this avoids nested loops:</b> Because each decision discards candidates that cannot possibly be part of the solution, the search boundaries contract monotonically.
+            </div>
+          </div>
+
+          <!-- Controls -->
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button onclick="setLcStep(4)" class="lc-btn-primary" style="padding: 7px 18px; font-size: 12.5px; background: #00b8a3; color: #000; font-weight: 700;">
-              Approach Sound → Step 4: Write Code
+            <button onclick="navigateLcStep(1)" class="lc-btn-primary" style="padding: 7px 18px; font-size: 12.5px; background: #00b8a3; color: #000; font-weight: 700;">
+              Proceed to Step 4: Write Code →
             </button>
-            <button onclick="setLcStep(2)" class="lc-btn-subtle" style="padding: 7px 14px; font-size: 12.5px;">
-              ✏️ Refine My Approach
+            <button onclick="navigateLcStep(-1)" class="lc-btn-subtle" style="padding: 7px 14px; font-size: 12.5px;">
+              ✏️ Refine My Strategy
             </button>
             <button onclick="requestMentorHint()" class="lc-btn-subtle" style="padding: 7px 14px; font-size: 12.5px; color: #ffc01e;">
-              💡 Another Hint
+              💡 Progressive Hint (${lc.hintLevel}/3)
             </button>
           </div>
         </div>
       `;
     }
 
+    // STEP 4: IMPLEMENTATION BLUEPRINT
     if (lc.step === 4) {
       return `
-        <div style="font-size: 13.5px; line-height: 1.6; color: #e2e8f0; margin-bottom: 14px;">
-          <p style="margin-bottom: 8px;">
-            <b>Step 4: Implementation in Python 3.</b>
-          </p>
-          <p style="color: #94a3b8; margin-bottom: 12px;">
-            Now apply your plan in the editor on the right. Notice the starter function signature: <code>${escapeHtml(prob.starterCode.split('\n')[0])}</code>.
-          </p>
-          
-          <div style="background: #14171d; border: 1px solid #2a3441; border-radius: 6px; padding: 10px 12px; margin-bottom: 14px; font-size: 12.5px; color: #94a3b8;">
-            <b>Implementation Checklist:</b><br>
-            • Initialize your pointers or data structures.<br>
-            • Ensure loop termination condition prevents infinite loops.<br>
-            • Return the correct format (e.g., indices or values).
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 13.5px; line-height: 1.6; color: #e2e8f0;">
+          <div>
+            <b style="color: #fff; font-size: 14.5px;">Step 4: Implementation Blueprint in Python 3</b>
+            <p style="color: #94a3b8; margin-top: 4px;">
+              Now translate the strategy into code in the editor on the right. Follow the checklist below to avoid typical pitfalls.
+            </p>
           </div>
 
+          <!-- Pre-flight Checklist -->
+          <div style="background: #14171d; border: 1px solid #283344; border-radius: 6px; padding: 12px 14px;">
+            <div style="font-size: 12px; font-weight: 700; color: #00b8a3; text-transform: uppercase; margin-bottom: 6px;">
+              ✅ Pre-Flight Implementation Checklist:
+            </div>
+            <div style="font-size: 12.5px; color: #cbd5e1; line-height: 1.6;">
+              1. <b>Zero-Indexing:</b> Python arrays are 0-indexed; the final element is at index <code>len(arr) - 1</code>.<br>
+              2. <b>Termination Condition:</b> Ensure loop boundary checks prevent infinite loops (e.g. <code>while left &lt; right</code>).<br>
+              3. <b>Simultaneous Assignment:</b> Use Python idioms like <code>left, right = 0, len(arr) - 1</code>.<br>
+              4. <b>Guard Against Missing Answers:</b> Return the required default (e.g. <code>[-1, -1]</code>) if no pair matches.
+            </div>
+          </div>
+
+          <!-- Coding Controls -->
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button onclick="runLcCode()" class="lc-btn-primary" style="padding: 7px 18px; font-size: 12.5px; background: #3b82f6;">
-              ▶ Run Code Against Tests
+            <button onclick="runLcCode()" class="lc-btn-primary" style="padding: 7px 18px; font-size: 12.5px; background: #3b82f6; color: #fff; font-weight: 600;">
+              ▶ Run Code (Ctrl+Enter)
             </button>
             <button onclick="requestMentorHint()" class="lc-btn-subtle" style="padding: 7px 14px; font-size: 12.5px; color: #ffc01e;">
               💡 Implementation Hint
             </button>
-            <button onclick="setLcStep(5)" class="lc-btn-subtle" style="padding: 7px 14px; font-size: 12.5px;">
-              Skip to Review & Tests →
+            <button onclick="navigateLcStep(1)" class="lc-btn-subtle" style="padding: 7px 14px; font-size: 12.5px;">
+              Proceed to Step 5: Test & Diagnostics →
             </button>
           </div>
         </div>
       `;
     }
 
+    // STEP 5: CODE REVIEW & TEST
     if (lc.step === 5) {
       const results = lc.testResults;
       return `
-        <div style="font-size: 13.5px; line-height: 1.6; color: #e2e8f0; margin-bottom: 14px;">
-          <p style="margin-bottom: 8px;">
-            <b>Step 5: Code Review & Bug Diagnostics.</b>
-          </p>
-          
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 13.5px; line-height: 1.6; color: #e2e8f0;">
+          <div>
+            <b style="color: #fff; font-size: 14.5px;">Step 5: Code Review & Bug Diagnostics</b>
+            <p style="color: #94a3b8; margin-top: 4px;">
+              Review automated test results and diagnostic error analysis.
+            </p>
+          </div>
+
           ${results ? `
-            <div style="background: ${results.passed ? 'rgba(0,184,163,0.1)' : 'rgba(239,68,68,0.1)'}; border: 1px solid ${results.passed ? '#00b8a340' : '#ef444440'}; border-radius: 6px; padding: 12px 14px; margin-bottom: 14px;">
-              <div style="font-weight: 700; color: ${results.passed ? '#00b8a3' : '#ef4444'}; margin-bottom: 6px;">
-                ${results.passed ? '🎉 All Test Cases Passed!' : '⚠️ Test Cases Need Adjustment'}
+            <div style="background: ${results.passed ? 'rgba(0,184,163,0.1)' : 'rgba(239,68,68,0.1)'}; border: 1px solid ${results.passed ? '#00b8a340' : '#ef444440'}; border-radius: 6px; padding: 12px 14px;">
+              <div style="font-weight: 700; color: ${results.passed ? '#00b8a3' : '#ef4444'}; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
+                <span>${results.passed ? '🎉 All Test Cases Passed!' : '⚠️ Tests Need Adjustment'}</span>
+                <span style="font-size: 11px; font-family: monospace; color: #888;">Runtime: ${results.time}ms</span>
               </div>
               <div style="font-size: 13px; color: #cbd5e1; line-height: 1.5;">
-                ${results.feedback || (results.passed ? 'Your algorithm correctly solved all sample scenarios!' : 'Review the failing test case in the bottom console.')}
+                ${results.feedback}
               </div>
             </div>
           ` : `
-            <p style="color: #94a3b8; margin-bottom: 12px;">
-              Click <b>Run</b> or <b>Submit</b> in the editor toolbar to execute your Python code against the automated test suite.
-            </p>
+            <div style="background: #14171d; border: 1px solid #283344; border-radius: 6px; padding: 12px 14px; color: #94a3b8; font-size: 13px;">
+              Click <b>▶ Run</b> or <b>✓ Submit</b> in the editor toolbar to run your Python code against test suites.
+            </div>
           `}
 
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button onclick="setLcStep(6)" class="lc-btn-primary" style="padding: 7px 18px; font-size: 12.5px; background: #00b8a3; color: #000; font-weight: 700;">
-              Step 6: Reveal Optimal Solution & Big-O →
+            <button onclick="navigateLcStep(1)" class="lc-btn-primary" style="padding: 7px 18px; font-size: 12.5px; background: #00b8a3; color: #000; font-weight: 700;">
+              Proceed to Step 6: Optimal Solution & Big-O →
             </button>
-            <button onclick="setLcStep(4)" class="lc-btn-subtle" style="padding: 7px 14px; font-size: 12.5px;">
-              ✏️ Keep Editing Code
+            <button onclick="navigateLcStep(-1)" class="lc-btn-subtle" style="padding: 7px 14px; font-size: 12.5px;">
+              ✏️ Continue Editing Code
             </button>
           </div>
         </div>
       `;
     }
 
+    // STEP 6: OPTIMAL SOLUTION & BIG-O PROOF
     if (lc.step === 6) {
+      const lineExplanations = generateLineByLineExplanation(prob.solution);
       return `
-        <div style="font-size: 13.5px; line-height: 1.6; color: #e2e8f0; margin-bottom: 14px;">
-          <p style="margin-bottom: 8px;">
-            <b>Step 6: Optimal Reference Solution & Complexity Analysis.</b>
-          </p>
-          
-          <!-- Code Block -->
-          <div style="background: #12151b; border: 1px solid #283344; border-radius: 6px; padding: 12px; margin-bottom: 14px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #e2e8f0; overflow-x: auto; white-space: pre;">
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 13.5px; line-height: 1.6; color: #e2e8f0;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <b style="color: #fff; font-size: 14.5px;">Step 6: Optimal Reference Solution & Line-by-Line Breakdown</b>
+              <p style="color: #94a3b8; margin-top: 4px;">
+                Study how each line of the reference code enforces the algorithmic invariant.
+              </p>
+            </div>
+            <button onclick="copySolutionToEditor()" class="lc-btn-subtle" style="padding: 4px 10px; font-size: 11.5px;">
+              📥 Insert Code
+            </button>
+          </div>
+
+          <!-- Code Display -->
+          <div style="background: #12151b; border: 1px solid #283344; border-radius: 6px; padding: 12px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #e2e8f0; overflow-x: auto; white-space: pre;">
 ${escapeHtml(prob.solution)}
           </div>
 
-          <!-- Complexity breakdown -->
-          <div style="background: #171b22; border: 1px solid #2a3441; border-radius: 6px; padding: 12px 14px; margin-bottom: 14px;">
-            <div style="font-size: 13px; font-weight: 700; color: #ffc01e; margin-bottom: 6px;">
-              ⏱️ Complexity Breakdown: ${prob.complexity}
+          <!-- Line-by-Line Breakdown Table -->
+          <div style="background: #14171d; border: 1px solid #283344; border-radius: 6px; overflow: hidden;">
+            <div style="padding: 8px 12px; background: #1a1f29; font-size: 11.5px; font-weight: 700; color: #60a5fa; text-transform: uppercase;">
+              📖 Line-by-Line Code Explanation
             </div>
-            <div style="font-size: 12.5px; color: #94a3b8; line-height: 1.5;">
-              • <b>Time:</b> Each element is processed at most once or twice within the bounds.<br>
-              • <b>Space:</b> Memory is kept strictly within auxiliary constraints (usually O(1) or O(K)).
+            <div style="max-height: 240px; overflow-y: auto; padding: 8px 12px; font-size: 12.5px;">
+              ${lineExplanations.map(item => `
+                <div style="padding: 6px 0; border-bottom: 1px solid #222b38;">
+                  <div style="font-family: 'JetBrains Mono', monospace; color: #ffc01e; font-size: 11.5px;">
+                    Line ${item.lineNum}: ${escapeHtml(item.code)}
+                  </div>
+                  <div style="color: #94a3b8; margin-top: 2px;">
+                    ${item.explanation}
+                  </div>
+                </div>
+              `).join('')}
             </div>
           </div>
 
+          <!-- Mathematical Complexity Breakdown -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div style="background: #14171d; border: 1px solid #283344; border-radius: 6px; padding: 10px 12px;">
+              <div style="font-size: 11px; font-weight: 700; color: #8cb4ff; text-transform: uppercase;">Time Complexity</div>
+              <div style="font-size: 14px; font-weight: 700; color: #00b8a3; margin: 4px 0;">${prob.complexity.split(',')[0]}</div>
+              <div style="font-size: 11.5px; color: #888;">Every element or boundary is checked at most once or twice.</div>
+            </div>
+            <div style="background: #14171d; border: 1px solid #283344; border-radius: 6px; padding: 10px 12px;">
+              <div style="font-size: 11px; font-weight: 700; color: #8cb4ff; text-transform: uppercase;">Space Complexity</div>
+              <div style="font-size: 14px; font-weight: 700; color: #00b8a3; margin: 4px 0;">${prob.complexity.split(',')[1]}</div>
+              <div style="font-size: 11.5px; color: #888;">Allocates strictly constant or minimal auxiliary memory.</div>
+            </div>
+          </div>
+
+          <!-- Controls -->
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button onclick="setLcStep(7)" class="lc-btn-primary" style="padding: 7px 18px; font-size: 12.5px; background: #00b8a3; color: #000; font-weight: 700;">
-              Step 7: Pattern Mastery Recap & Mark Solved →
+            <button onclick="navigateLcStep(1)" class="lc-btn-primary" style="padding: 7px 18px; font-size: 12.5px; background: #00b8a3; color: #000; font-weight: 700;">
+              Proceed to Step 7: Pattern Mastery Recap →
             </button>
             <button onclick="copySolutionToEditor()" class="lc-btn-subtle" style="padding: 7px 14px; font-size: 12.5px;">
-              📥 Copy Solution to Editor
+              📥 Copy into Editor
             </button>
           </div>
         </div>
       `;
     }
 
+    // STEP 7: PATTERN MASTERY & INTERVIEW STRATEGY
     if (lc.step === 7) {
       markProblemCompleted(prob.id);
+      const followUps = getFaangFollowUps(prob.patternId, prob);
+
       return `
-        <div style="font-size: 13.5px; line-height: 1.6; color: #e2e8f0; margin-bottom: 14px;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 13.5px; line-height: 1.6; color: #e2e8f0;">
+          <div style="display: flex; align-items: center; gap: 8px;">
             <span style="font-size: 20px;">🏆</span>
-            <b style="font-size: 15px; color: #00b8a3;">Problem ${prob.id} Completed!</b>
+            <div>
+              <b style="font-size: 15px; color: #00b8a3;">Problem ${prob.id} Mastered!</b>
+              <div style="font-size: 11.5px; color: #888;">Marked as completed (✓) in your curriculum progress</div>
+            </div>
           </div>
 
           <!-- Key Takeaway Card -->
-          <div style="background: rgba(0,184,163,0.08); border: 1px solid #00b8a330; border-radius: 6px; padding: 14px; margin-bottom: 14px;">
-            <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; color: #00b8a3; margin-bottom: 6px; letter-spacing: 0.5px;">
-              💎 Key Interview Lesson (${prob.patternName})
+          <div style="background: rgba(0,184,163,0.08); border: 1px solid #00b8a330; border-radius: 6px; padding: 14px;">
+            <div style="font-size: 11.5px; font-weight: 800; text-transform: uppercase; color: #00b8a3; margin-bottom: 6px; letter-spacing: 0.5px;">
+              💎 Key Interview Invariant (${prob.patternName})
             </div>
             <div style="font-size: 13px; color: #e2e8f0; line-height: 1.5;">
               ${prob.keyLesson}
             </div>
           </div>
 
-          <p style="color: #94a3b8; margin-bottom: 14px; font-size: 13px;">
-            You have mastered the mechanics for this challenge. Ready to apply this pattern to the next problem or explore another pattern?
-          </p>
+          <!-- FAANG Interview Follow-Ups -->
+          <div style="background: #14171d; border: 1px solid #283344; border-radius: 6px; padding: 12px 14px;">
+            <div style="font-size: 12px; font-weight: 700; color: #ffc01e; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">
+              🎯 Typical FAANG Interview Follow-Up Questions
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12.5px;">
+              ${followUps.map(f => `
+                <div>
+                  <b style="color: #60a5fa;">Q: ${f.q}</b><br>
+                  <span style="color: #94a3b8;">A: ${f.a}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
 
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <!-- Completion controls -->
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
             <button onclick="navigateLcProblem(1)" class="lc-btn-primary" style="padding: 7px 18px; font-size: 12.5px; background: #00b8a3; color: #000; font-weight: 700;">
-              Next Problem in Pattern →
+              Next Problem in Pattern (${prob.patternName}) →
             </button>
             <button onclick="setLcStep(1)" class="lc-btn-subtle" style="padding: 7px 14px; font-size: 12.5px;">
               ↺ Review from Step 1
@@ -841,6 +1146,7 @@ ${escapeHtml(prob.solution)}
 
   // Pattern Cheatsheet Tab HTML
   function renderPatternCheatsheetHtml(pat, prob) {
+    const philosophy = getPatternPhilosophy(pat.id, pat.name);
     return `
       <div style="background: #1e1e1e; border: 1px solid #2d2d2d; border-radius: 8px; padding: 20px; font-size: 13.5px; line-height: 1.6; color: #d4d4d4;">
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
@@ -855,6 +1161,15 @@ ${escapeHtml(prob.solution)}
         <p style="color: #cbd5e1; margin-bottom: 14px;">
           ${pat.description}
         </p>
+
+        <div style="background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.3); border-radius: 6px; padding: 14px; margin-bottom: 16px;">
+          <div style="font-size: 12px; font-weight: 700; color: #60a5fa; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">
+            📐 Core Mathematical Philosophy
+          </div>
+          <div style="color: #cbd5e1; font-size: 13px;">
+            ${philosophy}
+          </div>
+        </div>
 
         <div style="background: #141414; border: 1px solid #282828; border-radius: 6px; padding: 14px; margin-bottom: 16px;">
           <div style="font-size: 12px; font-weight: 700; color: #ffc01e; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">
@@ -881,6 +1196,7 @@ ${escapeHtml(prob.solution.split('\n').slice(0, 6).join('\n') + '\n    # ... log
 
   // Optimal Solution Tab HTML
   function renderOptimalSolutionHtml(prob) {
+    const lineExplanations = generateLineByLineExplanation(prob.solution);
     return `
       <div style="display: flex; flex-direction: column; gap: 16px;">
         <div style="background: #1e1e1e; border: 1px solid #2d2d2d; border-radius: 8px; padding: 18px;">
@@ -905,6 +1221,25 @@ ${escapeHtml(prob.solution)}
             <div style="background: #161a22; border: 1px solid #252e3d; border-radius: 6px; padding: 10px 12px;">
               <span style="font-size: 11px; font-weight: 700; color: #8cb4ff; text-transform: uppercase;">Space Complexity</span>
               <div style="font-size: 13.5px; font-weight: 700; color: #00b8a3; margin-top: 4px;">${prob.complexity.split(',')[1] || 'O(1)'}</div>
+            </div>
+          </div>
+
+          <!-- Line-by-Line Breakdown Table -->
+          <div style="background: #14171d; border: 1px solid #283344; border-radius: 6px; overflow: hidden; margin-bottom: 14px;">
+            <div style="padding: 8px 12px; background: #1a1f29; font-size: 11.5px; font-weight: 700; color: #60a5fa; text-transform: uppercase;">
+              📖 Detailed Line-by-Line Code Breakdown
+            </div>
+            <div style="max-height: 240px; overflow-y: auto; padding: 8px 12px; font-size: 12.5px;">
+              ${lineExplanations.map(item => `
+                <div style="padding: 6px 0; border-bottom: 1px solid #222b38;">
+                  <div style="font-family: 'JetBrains Mono', monospace; color: #ffc01e; font-size: 11.5px;">
+                    Line ${item.lineNum}: ${escapeHtml(item.code)}
+                  </div>
+                  <div style="color: #94a3b8; margin-top: 2px;">
+                    ${item.explanation}
+                  </div>
+                </div>
+              `).join('')}
             </div>
           </div>
 
@@ -1085,13 +1420,25 @@ ${lc.testOutputText || '<span style="color: #666;">No terminal output yet. Click
     if (body) body.innerHTML = renderConsoleBodyHtml(prob);
   };
 
+  // STEP NAVIGATION: FORWARD & BACKWARD
   window.setLcStep = function(stepNum) {
+    if (stepNum < 1 || stepNum > 7) return;
     lc.step = stepNum;
     localStorage.setItem(`forge_lc_step_${lc.selectedProblemId}`, stepNum);
     lc.activeTab = 'mentor';
     const prob = getProblem(lc.selectedProblemId);
     const container = document.getElementById('lc-center-content');
-    if (container) container.innerHTML = renderCenterTabContent(prob);
+    if (container) {
+      container.innerHTML = renderCenterTabContent(prob);
+      container.scrollTop = 0;
+    }
+  };
+
+  window.navigateLcStep = function(delta) {
+    let next = lc.step + delta;
+    if (next < 1) next = 1;
+    if (next > 7) next = 7;
+    window.setLcStep(next);
   };
 
   window.submitLcApproach = function() {
@@ -1108,7 +1455,7 @@ ${lc.testOutputText || '<span style="color: #666;">No terminal output yet. Click
     
     let hintText = "";
     if (lc.hintLevel === 1) {
-      hintText = `💡 <b>Hint 1 (Nudge):</b> Remember this is the <b>${prob.patternName}</b> pattern. How can you avoid repeated work without nested loops?`;
+      hintText = `💡 <b>Hint 1 (Nudge):</b> Remember this problem falls under <b>${prob.patternName}</b>. How can you prune branches or update pointers monotonically?`;
     } else if (lc.hintLevel === 2) {
       hintText = `💡 <b>Hint 2 (Direction):</b> ${prob.approach}`;
     } else {
