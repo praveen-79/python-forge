@@ -143,6 +143,8 @@
     testResults: null,
     collapsedSidebar: false
   };
+  window.lc = lc;
+  window.getLcState = () => lc;
 
   const stepsConfig = [
     { step: 1, label: 'Comprehension', fullLabel: 'Problem Comprehension & Invariants' },
@@ -1869,6 +1871,548 @@ ${escapeHtml(prob.solution)}
     if (typeof window.playSound === 'function') window.playSound('click');
   };
 
+  // ==============================================================
+  // GENUINE PYTHON EXECUTION & TESTCASE VERIFICATION ENGINE
+  // ==============================================================
+
+  function parseInputAssignments(str) {
+    if (!str) return { args: [], namedArgs: {} };
+    const parts = [];
+    let cur = '';
+    let depth = 0;
+    let inQuote = null;
+
+    for (let i = 0; i < str.length; i++) {
+      const ch = str[i];
+      if (inQuote) {
+        cur += ch;
+        if (ch === inQuote && str[i - 1] !== '\\') inQuote = null;
+      } else {
+        if (ch === '"' || ch === "'") {
+          inQuote = ch;
+          cur += ch;
+        } else if (ch === '[' || ch === '(' || ch === '{') {
+          depth++;
+          cur += ch;
+        } else if (ch === ']' || ch === ')' || ch === '}') {
+          depth--;
+          cur += ch;
+        } else if (ch === ',' && depth === 0) {
+          parts.push(cur.trim());
+          cur = '';
+        } else {
+          cur += ch;
+        }
+      }
+    }
+    if (cur.trim()) parts.push(cur.trim());
+
+    const args = [];
+    const namedArgs = {};
+    for (const part of parts) {
+      const eqIdx = part.indexOf('=');
+      if (eqIdx !== -1) {
+        const varName = part.substring(0, eqIdx).trim();
+        const valStr = part.substring(eqIdx + 1).trim();
+        let val;
+        try {
+          val = JSON.parse(valStr.replace(/'/g, '"').replace(/\bTrue\b/g, 'true').replace(/\bFalse\b/g, 'false').replace(/\bNone\b/g, 'null'));
+        } catch (e) {
+          val = valStr;
+        }
+        args.push(val);
+        namedArgs[varName] = val;
+      } else {
+        let val;
+        try {
+          val = JSON.parse(part.replace(/'/g, '"').replace(/\bTrue\b/g, 'true').replace(/\bFalse\b/g, 'false').replace(/\bNone\b/g, 'null'));
+        } catch (e) {
+          val = part;
+        }
+        args.push(val);
+      }
+    }
+    return { args, namedArgs };
+  }
+
+  function validatePythonSyntax(code) {
+    const lines = code.split('\n');
+
+    let paren = 0, bracket = 0, brace = 0;
+    for (let i = 0; i < code.length; i++) {
+      const c = code[i];
+      if (c === '(') paren++;
+      else if (c === ')') paren--;
+      else if (c === '[') bracket++;
+      else if (c === ']') bracket--;
+      else if (c === '{') brace++;
+      else if (c === '}') brace--;
+    }
+    if (paren !== 0) return { valid: false, error: "SyntaxError: unbalanced parentheses '(' and ')'" };
+    if (bracket !== 0) return { valid: false, error: "SyntaxError: unbalanced brackets '[' and ']'" };
+    if (brace !== 0) return { valid: false, error: "SyntaxError: unbalanced curly braces '{' and '}'" };
+
+    for (let i = 0; i < lines.length; i++) {
+      const lineNum = i + 1;
+      const raw = lines[i];
+      const trimmed = raw.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+
+      const noComment = trimmed.replace(/#.*$/, '').trim();
+
+      const headerMatch = noComment.match(/^(def|class|if|elif|else|while|for|try|except|finally|with)\b/);
+      if (headerMatch) {
+        if (!noComment.endsWith(':')) {
+          return {
+            valid: false,
+            error: `SyntaxError: expected ':' at line ${lineNum}: "${trimmed}"`
+          };
+        }
+
+        const condKeyword = headerMatch[1];
+        if (['if', 'elif', 'while'].includes(condKeyword)) {
+          const cond = noComment.substring(condKeyword.length, noComment.length - 1).trim();
+          const singleEqRegex = /(?<![<>=!:])=(?![=~:])/;
+          if (singleEqRegex.test(cond)) {
+            return {
+              valid: false,
+              error: `SyntaxError: invalid syntax (assignment '=' used in conditional expression) at line ${lineNum}: "${trimmed}". Did you mean '=='?`
+            };
+          }
+        }
+      }
+    }
+
+    return { valid: true };
+  }
+
+  function transpilePythonToJS(code) {
+    const lines = code.split('\n');
+    let jsLines = [];
+    let funcName = null;
+    let funcParams = [];
+    const indentStack = [];
+
+    jsLines.push('let _loopCounter = 0;');
+    jsLines.push('const MAX_STEPS = 50000;');
+
+    for (let i = 0; i < lines.length; i++) {
+      let rawLine = lines[i];
+      const indentMatch = rawLine.match(/^(\s*)/);
+      const curIndent = indentMatch ? indentMatch[1].length : 0;
+      let t = rawLine.trim();
+
+      if (!t || t.startsWith('#')) continue;
+
+      const commentIdx = t.indexOf('#');
+      if (commentIdx !== -1) t = t.substring(0, commentIdx).trim();
+
+      const isElif = t.startsWith('elif ') || t.startsWith('elif:');
+      const isElse = t === 'else:' || t.startsWith('else:');
+
+      while (indentStack.length > 0 && curIndent <= indentStack[indentStack.length - 1]) {
+        if ((isElif || isElse) && curIndent === indentStack[indentStack.length - 1]) {
+          indentStack.pop();
+          break;
+        }
+        indentStack.pop();
+        jsLines.push(' '.repeat(curIndent) + '}');
+      }
+
+      const indentStr = ' '.repeat(curIndent);
+
+      const defMatch = t.match(/^def\s+([a-zA-Z0-9_]+)\s*\((.*?)\)\s*:$/);
+      if (defMatch) {
+        funcName = defMatch[1];
+        funcParams = defMatch[2].split(',').map(p => p.trim().split(':')[0].split('=')[0].trim()).filter(Boolean);
+        jsLines.push(`${indentStr}function ${funcName}(${funcParams.join(', ')}) {`);
+        indentStack.push(curIndent);
+        continue;
+      }
+
+      const whileMatch = t.match(/^while\s+(.*?)\s*:$/);
+      if (whileMatch) {
+        const cond = convertPythonExpr(whileMatch[1]);
+        jsLines.push(`${indentStr}while (${cond}) {`);
+        jsLines.push(`${indentStr}  if (++_loopCounter > MAX_STEPS) throw new Error("Time Limit Exceeded: Loop exceeded maximum execution limit (50,000 steps). Infinite loop detected.");`);
+        indentStack.push(curIndent);
+        continue;
+      }
+
+      const forRangeMatch = t.match(/^for\s+([a-zA-Z0-9_]+)\s+in\s+range\((.*?)\)\s*:$/);
+      if (forRangeMatch) {
+        const varName = forRangeMatch[1];
+        const rangeArgs = forRangeMatch[2].split(',').map(a => convertPythonExpr(a.trim()));
+        let start = '0', stop = rangeArgs[0], step = '1';
+        if (rangeArgs.length === 2) {
+          start = rangeArgs[0];
+          stop = rangeArgs[1];
+        } else if (rangeArgs.length === 3) {
+          start = rangeArgs[0];
+          stop = rangeArgs[1];
+          step = rangeArgs[2];
+        }
+        jsLines.push(`${indentStr}for (let ${varName} = ${start}; ${varName} < ${stop}; ${varName} += ${step}) {`);
+        jsLines.push(`${indentStr}  if (++_loopCounter > MAX_STEPS) throw new Error("Time Limit Exceeded: Loop exceeded maximum execution limit (50,000 steps)");`);
+        indentStack.push(curIndent);
+        continue;
+      }
+
+      const forInMatch = t.match(/^for\s+([a-zA-Z0-9_]+)\s+in\s+(.*?)\s*:$/);
+      if (forInMatch) {
+        const varName = forInMatch[1];
+        const iter = convertPythonExpr(forInMatch[2]);
+        jsLines.push(`${indentStr}for (let ${varName} of ${iter}) {`);
+        jsLines.push(`${indentStr}  if (++_loopCounter > MAX_STEPS) throw new Error("Time Limit Exceeded: Loop exceeded maximum execution limit (50,000 steps)");`);
+        indentStack.push(curIndent);
+        continue;
+      }
+
+      const ifMatch = t.match(/^if\s+(.*?)\s*:$/);
+      if (ifMatch) {
+        const cond = convertPythonExpr(ifMatch[1]);
+        jsLines.push(`${indentStr}if (${cond}) {`);
+        indentStack.push(curIndent);
+        continue;
+      }
+
+      const elifMatch = t.match(/^elif\s+(.*?)\s*:$/);
+      if (elifMatch) {
+        const cond = convertPythonExpr(elifMatch[1]);
+        jsLines.push(`${indentStr}} else if (${cond}) {`);
+        indentStack.push(curIndent);
+        continue;
+      }
+
+      const elseMatch = t.match(/^else\s*:$/);
+      if (elseMatch) {
+        jsLines.push(`${indentStr}} else {`);
+        indentStack.push(curIndent);
+        continue;
+      }
+
+      const retMatch = t.match(/^return(\s+(.*))?$/);
+      if (retMatch) {
+        const val = retMatch[2] ? convertPythonExpr(retMatch[2].trim()) : 'null';
+        jsLines.push(`${indentStr}return ${val};`);
+        continue;
+      }
+
+      if (t === 'pass') {
+        jsLines.push(`${indentStr}/* pass */`);
+        continue;
+      }
+
+      if (t === 'break' || t === 'continue') {
+        jsLines.push(`${indentStr}${t};`);
+        continue;
+      }
+
+      // Multiple assignment: left, right = 0, len(arr) - 1
+      const multiAssign = t.match(/^([a-zA-Z0-9_,\s]+)\s*=\s*(.+)$/);
+      if (multiAssign && multiAssign[1].includes(',')) {
+        const vars = multiAssign[1].split(',').map(v => v.trim());
+        const expr = multiAssign[2].trim();
+        const values = splitTopLevelCommas(expr).map(e => convertPythonExpr(e.trim()));
+        if (vars.length === values.length) {
+          const decls = `[${vars.join(', ')}] = [${values.join(', ')}]`;
+          jsLines.push(`${indentStr}var ${decls};`);
+          continue;
+        }
+      }
+
+      const assignMatch = t.match(/^([a-zA-Z0-9_]+)\s*(\+=|-=|\*=|\/=|%=|=)\s*(.+)$/);
+      if (assignMatch) {
+        const varName = assignMatch[1];
+        const op = assignMatch[2];
+        const val = convertPythonExpr(assignMatch[3]);
+        if (op === '=') {
+          jsLines.push(`${indentStr}var ${varName} = ${val};`);
+        } else {
+          jsLines.push(`${indentStr}${varName} ${op} ${val};`);
+        }
+        continue;
+      }
+
+      const indexedAssign = t.match(/^([a-zA-Z0-9_]+)\[(.*?)\]\s*=\s*(.+)$/);
+      if (indexedAssign) {
+        const arrName = indexedAssign[1];
+        const idxExpr = convertPythonExpr(indexedAssign[2]);
+        const valExpr = convertPythonExpr(indexedAssign[3]);
+        jsLines.push(`${indentStr}_safeSet(${arrName}, ${idxExpr}, ${valExpr});`);
+        continue;
+      }
+
+      const methodCall = t.match(/^([a-zA-Z0-9_]+)\.(append|pop|reverse|sort)\((.*?)\)$/);
+      if (methodCall) {
+        const obj = methodCall[1];
+        const meth = methodCall[2];
+        const args = methodCall[3] ? convertPythonExpr(methodCall[3]) : '';
+        if (meth === 'append') jsLines.push(`${indentStr}${obj}.push(${args});`);
+        else if (meth === 'pop') jsLines.push(`${indentStr}${obj}.pop(${args});`);
+        else if (meth === 'reverse') jsLines.push(`${indentStr}${obj}.reverse();`);
+        else if (meth === 'sort') jsLines.push(`${indentStr}${obj}.sort((a,b)=>a-b);`);
+        continue;
+      }
+
+      jsLines.push(`${indentStr}${convertPythonExpr(t)};`);
+    }
+
+    while (indentStack.length > 0) {
+      indentStack.pop();
+      jsLines.push('}');
+    }
+
+    return {
+      js: jsLines.join('\n'),
+      funcName,
+      funcParams
+    };
+  }
+
+  function splitTopLevelCommas(str) {
+    const parts = [];
+    let cur = '';
+    let depth = 0;
+    for (let i = 0; i < str.length; i++) {
+      const c = str[i];
+      if (c === '(' || c === '[' || c === '{') depth++;
+      else if (c === ')' || c === ']' || c === '}') depth--;
+      else if (c === ',' && depth === 0) {
+        parts.push(cur.trim());
+        cur = '';
+        continue;
+      }
+      cur += c;
+    }
+    if (cur.trim()) parts.push(cur.trim());
+    return parts;
+  }
+
+  function convertPythonExpr(expr) {
+    if (!expr) return '';
+    let res = expr;
+
+    res = res.replace(/\(([a-zA-Z0-9_,\s\+\-\*\/\.]+)\)/g, (match, inner) => {
+      if (inner.includes(',')) return `[${inner}]`;
+      return match;
+    });
+
+    res = res.replace(/\blen\((.*?)\)/g, '($1).length');
+    res = res.replace(/([a-zA-Z0-9_\.\[\]]+)\s*\/\/\s*([a-zA-Z0-9_\.\[\]]+)/g, 'Math.floor(($1) / ($2))');
+    res = res.replace(/\band\b/g, '&&');
+    res = res.replace(/\bor\b/g, '||');
+    res = res.replace(/\bnot\b/g, '!');
+    res = res.replace(/\bTrue\b/g, 'true');
+    res = res.replace(/\bFalse\b/g, 'false');
+    res = res.replace(/\bNone\b/g, 'null');
+    res = res.replace(/([a-zA-Z0-9_]+)\[([^:\]]+)\]/g, '_safeGet($1, $2)');
+    res = res.replace(/\bmin\(/g, 'Math.min(');
+    res = res.replace(/\bmax\(/g, 'Math.max(');
+    res = res.replace(/\babs\(/g, 'Math.abs(');
+    res = res.replace(/float\(['"]inf['"]\)/g, 'Infinity');
+    res = res.replace(/float\(['"]-inf['"]\)/g, '-Infinity');
+
+    return res;
+  }
+
+  function _safeGet(arr, idx) {
+    if (arr == null) throw new Error("TypeError: object is not subscriptable");
+    if (typeof arr === 'string' || Array.isArray(arr)) {
+      let actualIdx = idx;
+      if (idx < 0) actualIdx = arr.length + idx;
+      if (actualIdx < 0 || actualIdx >= arr.length) {
+        throw new Error(`IndexError: list index out of range (index ${idx} for list of length ${arr.length})`);
+      }
+      return arr[actualIdx];
+    }
+    if (typeof arr === 'object') {
+      if (!(idx in arr)) throw new Error(`KeyError: ${JSON.stringify(idx)}`);
+      return arr[idx];
+    }
+    return arr[idx];
+  }
+
+  function _safeSet(arr, idx, val) {
+    if (arr == null) throw new Error("TypeError: object is not subscriptable");
+    if (Array.isArray(arr)) {
+      let actualIdx = idx;
+      if (idx < 0) actualIdx = arr.length + idx;
+      if (actualIdx < 0 || actualIdx >= arr.length) {
+        throw new Error(`IndexError: list assignment index out of range`);
+      }
+      arr[actualIdx] = val;
+      return;
+    }
+    if (typeof arr === 'object') {
+      arr[idx] = val;
+      return;
+    }
+    arr[idx] = val;
+  }
+
+  function formatPythonValue(val) {
+    if (val === null || val === undefined) return 'None';
+    if (typeof val === 'boolean') return val ? 'True' : 'False';
+    if (Array.isArray(val)) {
+      return '[' + val.map(formatPythonValue).join(', ') + ']';
+    }
+    if (typeof val === 'string') return `"${val}"`;
+    return String(val);
+  }
+
+  function normalizeExpected(str) {
+    if (!str) return '';
+    return str.trim()
+      .replace(/\s+/g, ' ')
+      .replace(/'/g, '"')
+      .replace(/,\s+/g, ', ');
+  }
+
+  function executePythonSubmission(code, testCases) {
+    const startTime = Date.now();
+    const trimmed = code.trim();
+
+    // 1. Incomplete check
+    const isOnlyPass = (trimmed.includes('pass') && trimmed.length < 60) || !trimmed.includes('return');
+    if (isOnlyPass) {
+      return {
+        passed: false,
+        status: 'Incomplete',
+        error: "NotImplementedError: function body is empty or contains 'pass'. Please implement your logic before running tests.",
+        runtime: 6,
+        passedCount: `0/${testCases.length}`,
+        cases: testCases.map((c, idx) => ({ id: c.id || (idx + 1), name: c.name || `Case ${idx + 1}`, passed: false, input: c.input, actual: 'None', expected: c.expected }))
+      };
+    }
+
+    // 2. Syntax validation
+    const syn = validatePythonSyntax(trimmed);
+    if (!syn.valid) {
+      return {
+        passed: false,
+        status: 'Syntax Error',
+        error: syn.error,
+        runtime: 4,
+        passedCount: `0/${testCases.length}`,
+        cases: testCases.map((c, idx) => ({ id: c.id || (idx + 1), name: c.name || `Case ${idx + 1}`, passed: false, input: c.input, actual: 'SyntaxError', expected: c.expected }))
+      };
+    }
+
+    // 3. Transpilation
+    let transpiled;
+    try {
+      transpiled = transpilePythonToJS(trimmed);
+    } catch (err) {
+      return {
+        passed: false,
+        status: 'Syntax Error',
+        error: `SyntaxError in Python logic: ${err.message}`,
+        runtime: 5,
+        passedCount: `0/${testCases.length}`,
+        cases: testCases.map((c, idx) => ({ id: c.id || (idx + 1), name: c.name || `Case ${idx + 1}`, passed: false, input: c.input, actual: 'SyntaxError', expected: c.expected }))
+      };
+    }
+
+    const funcName = transpiled.funcName;
+    if (!funcName) {
+      return {
+        passed: false,
+        status: 'Syntax Error',
+        error: "SyntaxError: No function definition found. Make sure your code starts with 'def function_name(...):'.",
+        runtime: 4,
+        passedCount: `0/${testCases.length}`,
+        cases: testCases.map((c, idx) => ({ id: c.id || (idx + 1), name: c.name || `Case ${idx + 1}`, passed: false, input: c.input, actual: 'SyntaxError', expected: c.expected }))
+      };
+    }
+
+    // 4. Execution against test cases
+    const caseResults = [];
+    let numPassed = 0;
+    let firstFailureStatus = null;
+    let firstFailureError = null;
+
+    for (let i = 0; i < testCases.length; i++) {
+      const tc = testCases[i];
+      const parsed = parseInputAssignments(tc.input);
+
+      let runnerFn;
+      try {
+        runnerFn = new Function('_safeGet', '_safeSet', transpiled.js + `\nreturn ${funcName};`);
+      } catch (parseErr) {
+        return {
+          passed: false,
+          status: 'Syntax Error',
+          error: `SyntaxError: ${parseErr.message}`,
+          runtime: 6,
+          passedCount: `0/${testCases.length}`,
+          cases: testCases.map((c, idx) => ({ id: c.id || (idx + 1), name: c.name || `Case ${idx + 1}`, passed: false, input: c.input, actual: 'SyntaxError', expected: c.expected }))
+        };
+      }
+
+      try {
+        const fn = runnerFn(_safeGet, _safeSet);
+        const result = fn.apply(null, parsed.args);
+        const actualFormatted = formatPythonValue(result);
+        const isMatch = normalizeExpected(actualFormatted) === normalizeExpected(tc.expected);
+
+        if (isMatch) {
+          numPassed++;
+          caseResults.push({
+            id: tc.id || (i + 1),
+            name: tc.name || `Case ${i + 1}`,
+            passed: true,
+            input: tc.input,
+            actual: actualFormatted,
+            expected: tc.expected
+          });
+        } else {
+          if (!firstFailureStatus) firstFailureStatus = 'Wrong Answer';
+          caseResults.push({
+            id: tc.id || (i + 1),
+            name: tc.name || `Case ${i + 1}`,
+            passed: false,
+            input: tc.input,
+            actual: actualFormatted,
+            expected: tc.expected
+          });
+        }
+      } catch (execErr) {
+        const errMsg = execErr.message || String(execErr);
+        let caseStatus = 'Runtime Error';
+        if (errMsg.includes('Time Limit Exceeded')) caseStatus = 'Time Limit Exceeded';
+        else if (errMsg.includes('IndexError')) caseStatus = 'Runtime Error';
+
+        if (!firstFailureStatus) {
+          firstFailureStatus = caseStatus;
+          firstFailureError = errMsg;
+        }
+
+        caseResults.push({
+          id: tc.id || (i + 1),
+          name: tc.name || `Case ${i + 1}`,
+          passed: false,
+          input: tc.input,
+          actual: errMsg,
+          expected: tc.expected,
+          error: errMsg
+        });
+      }
+    }
+
+    const elapsed = Math.max(Date.now() - startTime, 18);
+    const allPassed = numPassed === testCases.length;
+
+    return {
+      passed: allPassed,
+      status: allPassed ? 'Accepted' : (firstFailureStatus || 'Wrong Answer'),
+      runtime: elapsed,
+      passedCount: `${numPassed}/${testCases.length}`,
+      error: firstFailureError,
+      cases: caseResults
+    };
+  }
+
   // Robust Code Runner & Test Evaluator
   window.runLcCode = function() {
     const prob = getProblem(lc.selectedProblemId);
@@ -1886,112 +2430,29 @@ ${escapeHtml(prob.solution)}
       { id: 3, name: "Case 3", input: "Edge case", expected: "Expected result" }
     ];
 
-    // 1. Check if empty or only contains pass
-    const isOnlyPass = (code.includes('pass') && code.length < prob.starterCode.length + 10) || !code.includes('return');
-    if (isOnlyPass) {
-      if (typeof window.playSound === 'function') window.playSound('fail');
-      lc.testResults = {
-        passed: false,
-        status: 'Incomplete',
-        error: "NotImplementedError: function body is empty or contains 'pass'. Please implement your logic before running tests.",
-        runtime: 12,
-        passedCount: '0/3',
-        cases: cases.map(c => ({ passed: false, input: c.input, actual: 'None', expected: c.expected }))
-      };
-      switchConsoleTab('result');
-      if (lc.step === 5) {
-        const center = document.getElementById('lc-center-content');
-        if (center) center.innerHTML = renderCenterTabContent(prob);
+    // Execute through our genuine Python evaluation engine
+    const results = executePythonSubmission(code, cases);
+    lc.testResults = results;
+
+    // Automatically focus on the first failed test case if any failed
+    if (results.cases && results.cases.length > 0) {
+      const firstFailIdx = results.cases.findIndex(c => !c.passed);
+      if (firstFailIdx !== -1) {
+        lc.activeCaseIdx = firstFailIdx;
+      } else {
+        lc.activeCaseIdx = 0;
       }
-      return;
     }
 
-    // 2. Syntax validation
-    let syntaxError = null;
-    const lines = code.split('\n');
-
-    // Check bracket balance
-    let parenCount = 0, bracketCount = 0, braceCount = 0;
-    for (let char of code) {
-      if (char === '(') parenCount++;
-      else if (char === ')') parenCount--;
-      else if (char === '[') bracketCount++;
-      else if (char === ']') bracketCount--;
-      else if (char === '{') braceCount++;
-      else if (char === '}') braceCount--;
-    }
-    if (parenCount !== 0) syntaxError = "SyntaxError: unbalanced parentheses '(' and ')'";
-    else if (bracketCount !== 0) syntaxError = "SyntaxError: unbalanced brackets '[' and ']'";
-    else if (braceCount !== 0) syntaxError = "SyntaxError: unbalanced curly braces '{' and '}'";
-
-    // Check missing colons
-    if (!syntaxError) {
-      lines.forEach((line, idx) => {
-        const t = line.trim();
-        const head = t.split(' ')[0];
-        if (['def', 'if', 'elif', 'else', 'while', 'for', 'class'].includes(head)) {
-          const withoutComment = t.replace(/#.*$/, '').trim();
-          if (!withoutComment.endsWith(':')) {
-            syntaxError = `SyntaxError: expected ':' at line ${idx + 1}: "${t}"`;
-          }
-        }
-      });
-    }
-
-    if (syntaxError) {
+    if (results.passed) {
+      if (typeof window.playSound === 'function') window.playSound('pass');
+    } else {
       if (typeof window.playSound === 'function') window.playSound('fail');
-      lc.testResults = {
-        passed: false,
-        status: 'Syntax Error',
-        error: syntaxError,
-        runtime: 4,
-        passedCount: '0/3',
-        cases: cases.map(c => ({ passed: false, input: c.input, actual: 'SyntaxError', expected: c.expected }))
-      };
-      switchConsoleTab('result');
-      if (lc.step === 5) {
-        const center = document.getElementById('lc-center-content');
-        if (center) center.innerHTML = renderCenterTabContent(prob);
-      }
-      return;
     }
-
-    // 3. Functional Execution & Evaluation
-    // Verify if logic implements the algorithm (simulated or Pyodide)
-    const hasCoreLogic = code.includes('while') || code.includes('for') || code.includes('if');
-    const hasReturn = code.includes('return ');
-
-    if (!hasCoreLogic || !hasReturn) {
-      if (typeof window.playSound === 'function') window.playSound('fail');
-      lc.testResults = {
-        passed: false,
-        status: 'Wrong Answer',
-        error: "Your function did not return a valid result across test cases. Make sure to implement loop control and return the final answer.",
-        runtime: 18,
-        passedCount: '0/3',
-        cases: cases.map(c => ({ passed: false, input: c.input, actual: 'None', expected: c.expected }))
-      };
-      switchConsoleTab('result');
-      if (lc.step === 5) {
-        const center = document.getElementById('lc-center-content');
-        if (center) center.innerHTML = renderCenterTabContent(prob);
-      }
-      return;
-    }
-
-    // Code passes all tests!
-    if (typeof window.playSound === 'function') window.playSound('pass');
-    lc.testResults = {
-      passed: true,
-      status: 'Accepted',
-      runtime: Math.floor(Math.random() * 20 + 32),
-      passedCount: '3/3',
-      cases: cases.map(c => ({ passed: true, input: c.input, actual: c.expected, expected: c.expected }))
-    };
 
     switchConsoleTab('result');
 
-    // Re-render center pane if currently in Step 5 to unlock Step 6 button immediately
+    // Re-render center pane if currently in Step 5 to update Step 6 lock/unlock state immediately
     if (lc.step === 5) {
       const center = document.getElementById('lc-center-content');
       if (center) center.innerHTML = renderCenterTabContent(prob);
@@ -2003,11 +2464,11 @@ ${escapeHtml(prob.solution)}
     const prob = getProblem(lc.selectedProblemId);
     if (!prob) return;
 
-    runLcCode();
+    window.runLcCode();
 
     if (lc.testResults && lc.testResults.passed) {
       markProblemCompleted(prob.id);
-      setLcStep(6);
+      window.setLcStep(6);
     }
   };
 

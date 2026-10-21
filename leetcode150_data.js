@@ -118,14 +118,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "arr = [1, 2, 3], target = 6",
-        "expected": "[1, 3]"
+        "input": "arr = [2, 5, 9, 11], target = 11",
+        "expected": "[0, 2]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "arr = [0], target = 6",
-        "expected": "[]"
+        "input": "arr = [1, 2, 3, 4], target = 10",
+        "expected": "[-1, -1]"
       }
     ]
   },
@@ -151,14 +151,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "arr = [2, 3, 3]",
-        "expected": "4"
+        "input": "arr = [1, 1, 1, 1]",
+        "expected": "1"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "arr = [1, 2, 3, 4, 5]",
+        "expected": "5"
       }
     ]
   },
@@ -184,14 +184,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "arr = [-4, -1, 0]",
-        "expected": "[0, 1, 9, 16, 100]"
+        "input": "arr = [-2, -1, 0, 2, 3]",
+        "expected": "[0, 1, 4, 4, 9]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "arr = [0]",
-        "expected": "[]"
+        "input": "arr = [-3, 0, 3]",
+        "expected": "[0, 9, 9]"
       }
     ]
   },
@@ -217,14 +217,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "arr = [-3, 0, 1]",
-        "expected": "[[-3, 1, 2], [-2, 0, 2], [-2, 1, 1], [-1, 0, 1]]"
+        "input": "arr = [-5, 2, -1, -2, 3]",
+        "expected": "[[-5, 2, 3], [-2, -1, 3]]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "arr = [0]",
-        "expected": "[-1, -1]"
+        "input": "arr = [1, 2, 3]",
+        "expected": "[]"
       }
     ]
   },
@@ -250,14 +250,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "arr = [-2, 0, 1], target = 2",
-        "expected": "1"
+        "input": "arr = [-3, -1, 1, 2], target = 1",
+        "expected": "0"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "arr = [1, 0, 1, 1], target = 100",
+        "expected": "3"
       }
     ]
   },
@@ -283,13 +283,13 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "arr = [-1, 0, 2], target = 3",
-        "expected": "2"
+        "input": "arr = [-1, 4, 2, 1, 3], target = 5",
+        "expected": "4"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
+        "input": "arr = [1, 2, 3], target = 1",
         "expected": "0"
       }
     ]
@@ -316,13 +316,13 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "arr = [2, 5, 3], target = 30",
-        "expected": "[[2], [5], [2, 5], [3], [5, 3], [10]]"
+        "input": "arr = [8, 2, 6, 5], target = 50",
+        "expected": "[[8], [2], [8, 2], [6], [2, 6], [5], [6, 5]]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "arr = [0], target = 30",
+        "input": "arr = [1, 2, 3], target = 0",
         "expected": "[]"
       }
     ]
@@ -349,14 +349,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "arr = [1, 0, 2]",
-        "expected": "[0, 0, 1, 1, 2]"
+        "input": "arr = [2, 2, 0, 1, 2, 0]",
+        "expected": "[0, 0, 1, 2, 2, 2]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "arr = [0]",
-        "expected": "[]"
+        "input": "arr = [0, 1, 2]",
+        "expected": "[0, 1, 2]"
       }
     ]
   },
@@ -376,19 +376,19 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 1,
         "name": "Case 1",
-        "input": "heights = [0,1,0,2,1,0,1,3,2,1,2,1]",
+        "input": "heights = [0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]",
         "expected": "6"
       },
       {
         "id": 2,
         "name": "Case 2",
-        "input": "heights = [0,1,0,2,1,0,1,3,2,1,2,1] (Case 2)",
-        "expected": "6"
+        "input": "heights = [4, 2, 0, 3, 2, 5]",
+        "expected": "9"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
+        "input": "heights = [1, 2, 3, 4, 5]",
         "expected": "0"
       }
     ]
@@ -409,20 +409,20 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 1,
         "name": "Case 1",
-        "input": "heights = [1,8,6,2,5,4,8,3,7]",
+        "input": "heights = [1, 8, 6, 2, 5, 4, 8, 3, 7]",
         "expected": "49"
       },
       {
         "id": 2,
         "name": "Case 2",
-        "input": "heights = [1,8,6,2,5,4,8,3,7] (Case 2)",
-        "expected": "49"
+        "input": "heights = [1, 1]",
+        "expected": "1"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "heights = [4, 3, 2, 1, 4]",
+        "expected": "16"
       }
     ]
   },
@@ -448,14 +448,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[2, 1, 5, 1, 3, 2], k=3 (Case 2)",
+        "input": "[2, 1, 5, 1, 3, 2], k=3",
         "expected": "9"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[2, 1, 5, 1, 3, 2], k=3",
+        "expected": "9"
       }
     ]
   },
@@ -481,14 +481,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[2, 1, 5, 2, 3, 2], S=7 (Case 2)",
+        "input": "[2, 1, 5, 2, 3, 2], S=7",
         "expected": "2"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[2, 1, 5, 2, 3, 2], S=7",
+        "expected": "2"
       }
     ]
   },
@@ -514,14 +514,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "String=\"araaci\", K=2 (Case 2)",
+        "input": "String=\"araaci\", K=2",
         "expected": "4"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "String=\"araaci\", K=2",
+        "expected": "4"
       }
     ]
   },
@@ -547,14 +547,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "fruits=['A', 'B', 'C', 'A', 'C'] (Case 2)",
+        "input": "fruits=['A', 'B', 'C', 'A', 'C']",
         "expected": "3"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "fruits=['A', 'B', 'C', 'A', 'C']",
+        "expected": "3"
       }
     ]
   },
@@ -580,14 +580,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "\"aabccbb\" (Case 2)",
+        "input": "\"aabccbb\"",
         "expected": "3"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "\"aabccbb\"",
+        "expected": "3"
       }
     ]
   },
@@ -613,14 +613,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "s = \"aabccbb\", k = 2 (Case 2)",
+        "input": "s = \"aabccbb\", k = 2",
         "expected": "5"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "s = \"aabccbb\", k = 2",
+        "expected": "5"
       }
     ]
   },
@@ -646,14 +646,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1], k=2 (Case 2)",
+        "input": "[0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1], k=2",
         "expected": "6"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1], k=2",
+        "expected": "6"
       }
     ]
   },
@@ -679,14 +679,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "str1=\"oidbcaf\", pattern=\"abc\" (Case 2)",
+        "input": "str1=\"oidbcaf\", pattern=\"abc\"",
         "expected": "True"
       },
       {
         "id": 3,
         "name": "Case 3",
         "input": "str1=\"oidbcaf\", pattern=\"abc\"",
-        "expected": "False"
+        "expected": "True"
       }
     ]
   },
@@ -712,14 +712,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "str1=\"ppqp\", pattern=\"pq\" (Case 2)",
+        "input": "str1=\"ppqp\", pattern=\"pq\"",
         "expected": "[1, 2]"
       },
       {
         "id": 3,
         "name": "Case 3",
         "input": "str1=\"ppqp\", pattern=\"pq\"",
-        "expected": "[]"
+        "expected": "[1, 2]"
       }
     ]
   },
@@ -745,14 +745,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "s=\"aabdec\", t=\"abc\" (Case 2)",
+        "input": "s=\"aabdec\", t=\"abc\"",
         "expected": "\"abdec\""
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "s=\"aabdec\", t=\"abc\"",
+        "expected": "\"abdec\""
       }
     ]
   },
@@ -772,20 +772,20 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 1,
         "name": "Case 1",
-        "input": "Standard sample for LinkedList Cycle Detection",
-        "expected": "Valid output"
+        "input": "Sample input",
+        "expected": "Expected result"
       },
       {
         "id": 2,
         "name": "Case 2",
-        "input": "Secondary sample for LinkedList Cycle Detection",
-        "expected": "Valid output"
+        "input": "Sample input",
+        "expected": "Expected result"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Edge boundary for LinkedList Cycle Detection",
-        "expected": "Default result"
+        "input": "Sample input",
+        "expected": "Expected result"
       }
     ]
   },
@@ -805,20 +805,20 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 1,
         "name": "Case 1",
-        "input": "Standard sample for Start of LinkedList Cycle",
-        "expected": "Valid output"
+        "input": "Sample input",
+        "expected": "Expected result"
       },
       {
         "id": 2,
         "name": "Case 2",
-        "input": "Secondary sample for Start of LinkedList Cycle",
-        "expected": "Valid output"
+        "input": "Sample input",
+        "expected": "Expected result"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Edge boundary for Start of LinkedList Cycle",
-        "expected": "Default result"
+        "input": "Sample input",
+        "expected": "Expected result"
       }
     ]
   },
@@ -844,14 +844,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "23 -> 2^2+3^2=13 -> 1^2+3^2=10 -> 1^2+0^2=1 (Case 2)",
+        "input": "23 -> 2^2+3^2=13 -> 1^2+3^2=10 -> 1^2+0^2=1",
         "expected": "True"
       },
       {
         "id": 3,
         "name": "Case 3",
         "input": "23 -> 2^2+3^2=13 -> 1^2+3^2=10 -> 1^2+0^2=1",
-        "expected": "False"
+        "expected": "True"
       }
     ]
   },
@@ -877,14 +877,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "1 -> 2 -> 3 -> 4 -> 5 (Case 2)",
+        "input": "1 -> 2 -> 3 -> 4 -> 5",
         "expected": "Node 3"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "1 -> 2 -> 3 -> 4 -> 5",
+        "expected": "Node 3"
       }
     ]
   },
@@ -910,14 +910,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "2 -> 4 -> 6 -> 4 -> 2 (Case 2)",
+        "input": "2 -> 4 -> 6 -> 4 -> 2",
         "expected": "True"
       },
       {
         "id": 3,
         "name": "Case 3",
         "input": "2 -> 4 -> 6 -> 4 -> 2",
-        "expected": "False"
+        "expected": "True"
       }
     ]
   },
@@ -943,14 +943,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "2 -> 4 -> 6 -> 8 -> 10 -> 12 (Case 2)",
+        "input": "2 -> 4 -> 6 -> 8 -> 10 -> 12",
         "expected": "2 -> 12 -> 4 -> 10 -> 6 -> 8"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "2 -> 4 -> 6 -> 8 -> 10 -> 12",
+        "expected": "2 -> 12 -> 4 -> 10 -> 6 -> 8"
       }
     ]
   },
@@ -976,14 +976,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[1, 2, -1, 2, 2] (Case 2)",
+        "input": "[1, 2, -1, 2, 2]",
         "expected": "True"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "[1]",
-        "expected": "False"
+        "input": "[1, 2, -1, 2, 2]",
+        "expected": "True"
       }
     ]
   },
@@ -1009,14 +1009,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[1, 4, 4, 3, 2] (Case 2)",
+        "input": "[1, 4, 4, 3, 2]",
         "expected": "4"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[1, 4, 4, 3, 2]",
+        "expected": "4"
       }
     ]
   },
@@ -1042,14 +1042,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "1 -> 2 -> 3 -> 4 -> 5, n = 2 (Case 2)",
+        "input": "1 -> 2 -> 3 -> 4 -> 5, n = 2",
         "expected": "1 -> 2 -> 3 -> 5"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "1 -> 2 -> 3 -> 4 -> 5, n = 2",
+        "expected": "1 -> 2 -> 3 -> 5"
       }
     ]
   },
@@ -1075,14 +1075,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "head = [1,2,3,4] (Case 2)",
+        "input": "head = [1,2,3,4]",
         "expected": "[1,4,2,3]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "head = [0]",
-        "expected": "[]"
+        "input": "head = [1,2,3,4]",
+        "expected": "[1,4,2,3]"
       }
     ]
   },
@@ -1108,14 +1108,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "intervals = [[1,4], [2,5], [7,9]] (Case 2)",
+        "input": "intervals = [[1,4], [2,5], [7,9]]",
         "expected": "[[1,5], [7,9]]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "intervals = [0], [2,5], [7,9]]",
-        "expected": "[]"
+        "input": "intervals = [[1,4], [2,5], [7,9]]",
+        "expected": "[[1,5], [7,9]]"
       }
     ]
   },
@@ -1141,14 +1141,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "intervals=[[1,3], [5,7], [8,12]], new_interval=[4,6] (Case 2)",
+        "input": "intervals=[[1,3], [5,7], [8,12]], new_interval=[4,6]",
         "expected": "[[1,3], [4,7], [8,12]]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "intervals=[0], [5,7], [8,12]], new_interval=[4,6]",
-        "expected": "[]"
+        "input": "intervals=[[1,3], [5,7], [8,12]], new_interval=[4,6]",
+        "expected": "[[1,3], [4,7], [8,12]]"
       }
     ]
   },
@@ -1174,14 +1174,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "arr1=[[1, 3], [5, 6], [7, 9]], arr2=[[2, 3], [5, 7]] (Case 2)",
+        "input": "arr1=[[1, 3], [5, 6], [7, 9]], arr2=[[2, 3], [5, 7]]",
         "expected": "[[2, 3], [5, 6], [7, 7]]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "arr1=[0], [5, 6], [7, 9]], arr2=[[2, 3], [5, 7]]",
-        "expected": "[]"
+        "input": "arr1=[[1, 3], [5, 6], [7, 9]], arr2=[[2, 3], [5, 7]]",
+        "expected": "[[2, 3], [5, 6], [7, 7]]"
       }
     ]
   },
@@ -1207,13 +1207,13 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[[1,4], [2,5], [7,9]] (Case 2)",
+        "input": "[[1,4], [2,5], [7,9]]",
         "expected": "False"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "[1], [2,5], [7,9]]",
+        "input": "[[1,4], [2,5], [7,9]]",
         "expected": "False"
       }
     ]
@@ -1240,14 +1240,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[[1,4], [2,5], [7,9]] (Case 2)",
+        "input": "[[1,4], [2,5], [7,9]]",
         "expected": "2"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[[1,4], [2,5], [7,9]]",
+        "expected": "2"
       }
     ]
   },
@@ -1273,14 +1273,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[[1,4,3], [2,5,4], [7,9,6]] (Case 2)",
+        "input": "[[1,4,3], [2,5,4], [7,9,6]]",
         "expected": "7"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[[1,4,3], [2,5,4], [7,9,6]]",
+        "expected": "7"
       }
     ]
   },
@@ -1306,14 +1306,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "schedule = [[[1,3], [5,6]], [[2,3], [6,8]]] (Case 2)",
+        "input": "schedule = [[[1,3], [5,6]], [[2,3], [6,8]]]",
         "expected": "[[3,5]]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "schedule = [0], [5,6]], [[2,3], [6,8]]]",
-        "expected": "[]"
+        "input": "schedule = [[[1,3], [5,6]], [[2,3], [6,8]]]",
+        "expected": "[[3,5]]"
       }
     ]
   },
@@ -1339,14 +1339,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "intervals = [[1,2],[2,3],[3,4],[1,3]] (Case 2)",
+        "input": "intervals = [[1,2],[2,3],[3,4],[1,3]]",
         "expected": "1"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "intervals = [[1,2],[2,3],[3,4],[1,3]]",
+        "expected": "1"
       }
     ]
   },
@@ -1372,14 +1372,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[[1,4], [2,5], [7,9]] (Case 2)",
+        "input": "[[1,4], [2,5], [7,9]]",
         "expected": "Merged: [[1,5], [7,9]], Contributors: [2, 1]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[[1,4], [2,5], [7,9]]",
+        "expected": "Merged: [[1,5], [7,9]], Contributors: [2, 1]"
       }
     ]
   },
@@ -1405,14 +1405,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "s = \"ababcbacadefegdehijhklij\" (Case 2)",
+        "input": "s = \"ababcbacadefegdehijhklij\"",
         "expected": "[9, 7, 8]"
       },
       {
         "id": 3,
         "name": "Case 3",
         "input": "s = \"ababcbacadefegdehijhklij\"",
-        "expected": "[]"
+        "expected": "[9, 7, 8]"
       }
     ]
   },
@@ -1438,14 +1438,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[3, 1, 5, 4, 2] (Case 2)",
+        "input": "[3, 1, 5, 4, 2]",
         "expected": "[1, 2, 3, 4, 5]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "[0]",
-        "expected": "[]"
+        "input": "[3, 1, 5, 4, 2]",
+        "expected": "[1, 2, 3, 4, 5]"
       }
     ]
   },
@@ -1471,14 +1471,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[4, 0, 3, 1] (Case 2)",
+        "input": "[4, 0, 3, 1]",
         "expected": "2"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[4, 0, 3, 1]",
+        "expected": "2"
       }
     ]
   },
@@ -1504,14 +1504,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[2, 3, 1, 8, 2, 3, 5, 1] (Case 2)",
+        "input": "[2, 3, 1, 8, 2, 3, 5, 1]",
         "expected": "[4, 6, 7]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "[0]",
-        "expected": "[]"
+        "input": "[2, 3, 1, 8, 2, 3, 5, 1]",
+        "expected": "[4, 6, 7]"
       }
     ]
   },
@@ -1537,14 +1537,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[1, 4, 4, 3, 2] (Case 2)",
+        "input": "[1, 4, 4, 3, 2]",
         "expected": "4"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[1, 4, 4, 3, 2]",
+        "expected": "4"
       }
     ]
   },
@@ -1570,14 +1570,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[3, 4, 4, 5, 5] (Case 2)",
+        "input": "[3, 4, 4, 5, 5]",
         "expected": "[4, 5]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "[0]",
-        "expected": "[]"
+        "input": "[3, 4, 4, 5, 5]",
+        "expected": "[4, 5]"
       }
     ]
   },
@@ -1603,14 +1603,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[3, 1, 2, 5, 2] (Case 2)",
+        "input": "[3, 1, 2, 5, 2]",
         "expected": "[2, 4]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "[0]",
-        "expected": "[]"
+        "input": "[3, 1, 2, 5, 2]",
+        "expected": "[2, 4]"
       }
     ]
   },
@@ -1636,14 +1636,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "nums = [3, 4, -1]",
+        "input": "nums = [3, 4, -1, 1]",
         "expected": "2"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "nums = [3, 4, -1, 1]",
+        "expected": "2"
       }
     ]
   },
@@ -1669,14 +1669,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "arr = [2, 3, 4], k = 5",
+        "input": "arr = [2, 3, 4, 7, 11], k = 5",
         "expected": "9"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "arr = [2, 3, 4, 7, 11], k = 5",
+        "expected": "9"
       }
     ]
   },
@@ -1702,14 +1702,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "nums = [1, 2, 2]",
+        "input": "nums = [1, 2, 2, 4]",
         "expected": "[2, 3]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "nums = [0]",
-        "expected": "[]"
+        "input": "nums = [1, 2, 2, 4]",
+        "expected": "[2, 3]"
       }
     ]
   },
@@ -1735,14 +1735,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[3, -2, 0, 1, 2] (Case 2)",
+        "input": "[3, -2, 0, 1, 2]",
         "expected": "4"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[3, -2, 0, 1, 2]",
+        "expected": "4"
       }
     ]
   },
@@ -1768,14 +1768,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "2 -> 4 -> 6 -> 8 -> 10 (Case 2)",
+        "input": "2 -> 4 -> 6 -> 8 -> 10",
         "expected": "10 -> 8 -> 6 -> 4 -> 2"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "2 -> 4 -> 6 -> 8 -> 10",
+        "expected": "10 -> 8 -> 6 -> 4 -> 2"
       }
     ]
   },
@@ -1801,14 +1801,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "1 -> 2 -> 3 -> 4 -> 5, p = 2, q = 4 (Case 2)",
+        "input": "1 -> 2 -> 3 -> 4 -> 5, p = 2, q = 4",
         "expected": "1 -> 4 -> 3 -> 2 -> 5"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "1 -> 2 -> 3 -> 4 -> 5, p = 2, q = 4",
+        "expected": "1 -> 4 -> 3 -> 2 -> 5"
       }
     ]
   },
@@ -1834,14 +1834,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8, k = 3 (Case 2)",
+        "input": "1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8, k = 3",
         "expected": "3 -> 2 -> 1 -> 6 -> 5 -> 4 -> 8 -> 7"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8, k = 3",
+        "expected": "3 -> 2 -> 1 -> 6 -> 5 -> 4 -> 8 -> 7"
       }
     ]
   },
@@ -1867,14 +1867,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8, k = 2 (Case 2)",
+        "input": "1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8, k = 2",
         "expected": "2 -> 1 -> 3 -> 4 -> 6 -> 5 -> 7 -> 8"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8, k = 2",
+        "expected": "2 -> 1 -> 3 -> 4 -> 6 -> 5 -> 7 -> 8"
       }
     ]
   },
@@ -1900,14 +1900,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "1 -> 2 -> 3 -> 4 -> 5, k = 2 (Case 2)",
+        "input": "1 -> 2 -> 3 -> 4 -> 5, k = 2",
         "expected": "4 -> 5 -> 1 -> 2 -> 3"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "1 -> 2 -> 3 -> 4 -> 5, k = 2",
+        "expected": "4 -> 5 -> 1 -> 2 -> 3"
       }
     ]
   },
@@ -1933,14 +1933,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "1 -> 2 -> 3 -> 4 (Case 2)",
+        "input": "1 -> 2 -> 3 -> 4",
         "expected": "2 -> 1 -> 4 -> 3"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "1 -> 2 -> 3 -> 4",
+        "expected": "2 -> 1 -> 4 -> 3"
       }
     ]
   },
@@ -1966,14 +1966,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[5,2,6,3,9,1,7,3,8,4] (Case 2)",
+        "input": "[5,2,6,3,9,1,7,3,8,4]",
         "expected": "[5,6,2,3,9,1,4,8,3,7]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "[0]",
-        "expected": "[]"
+        "input": "[5,2,6,3,9,1,7,3,8,4]",
+        "expected": "[5,6,2,3,9,1,4,8,3,7]"
       }
     ]
   },
@@ -1999,14 +1999,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "1 -> 2 -> 2 -> 1 (Case 2)",
+        "input": "1 -> 2 -> 2 -> 1",
         "expected": "True"
       },
       {
         "id": 3,
         "name": "Case 3",
         "input": "1 -> 2 -> 2 -> 1",
-        "expected": "False"
+        "expected": "True"
       }
     ]
   },
@@ -2032,14 +2032,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": " (Case 2)",
+        "input": "",
         "expected": "7 -> 0 -> 8"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "",
+        "expected": "7 -> 0 -> 8"
       }
     ]
   },
@@ -2065,14 +2065,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "head = [1,2,3,4,5,6,7,8,9,10], k = 3 (Case 2)",
+        "input": "head = [1,2,3,4,5,6,7,8,9,10], k = 3",
         "expected": "[[1,2,3,4],[5,6,7],[8,9,10]]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "head = [0], k = 3",
-        "expected": "[]"
+        "input": "head = [1,2,3,4,5,6,7,8,9,10], k = 3",
+        "expected": "[[1,2,3,4],[5,6,7],[8,9,10]]"
       }
     ]
   },
@@ -2098,14 +2098,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "root = [3,9,20,null,null,15,7] (Case 2)",
+        "input": "root = [3,9,20,null,null,15,7]",
         "expected": "[[3],[9,20],[15,7]]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "root = [0]",
-        "expected": "[]"
+        "input": "root = [3,9,20,null,null,15,7]",
+        "expected": "[[3],[9,20],[15,7]]"
       }
     ]
   },
@@ -2131,14 +2131,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[3,9,20,null,null,15,7] (Case 2)",
+        "input": "[3,9,20,null,null,15,7]",
         "expected": "[[15,7],[9,20],[3]]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "[0]",
-        "expected": "[]"
+        "input": "[3,9,20,null,null,15,7]",
+        "expected": "[[15,7],[9,20],[3]]"
       }
     ]
   },
@@ -2164,14 +2164,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[3,9,20,null,null,15,7] (Case 2)",
+        "input": "[3,9,20,null,null,15,7]",
         "expected": "[[3],[20,9],[15,7]]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "[0]",
-        "expected": "[]"
+        "input": "[3,9,20,null,null,15,7]",
+        "expected": "[[3],[20,9],[15,7]]"
       }
     ]
   },
@@ -2197,14 +2197,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[3,9,20,null,null,15,7] (Case 2)",
+        "input": "[3,9,20,null,null,15,7]",
         "expected": "[3.0, 14.5, 11.0]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "[0]",
-        "expected": "[]"
+        "input": "[3,9,20,null,null,15,7]",
+        "expected": "[3.0, 14.5, 11.0]"
       }
     ]
   },
@@ -2230,14 +2230,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[3,9,20,null,null,15,7] (Case 2)",
+        "input": "[3,9,20,null,null,15,7]",
         "expected": "2"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[3,9,20,null,null,15,7]",
+        "expected": "2"
       }
     ]
   },
@@ -2263,14 +2263,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[3,9,20,null,null,15,7] (Case 2)",
+        "input": "[3,9,20,null,null,15,7]",
         "expected": "3"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[3,9,20,null,null,15,7]",
+        "expected": "3"
       }
     ]
   },
@@ -2296,14 +2296,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[1,2,3,4,5], key = 3 (Case 2)",
+        "input": "[1,2,3,4,5], key = 3",
         "expected": "4"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[1,2,3,4,5], key = 3",
+        "expected": "4"
       }
     ]
   },
@@ -2329,14 +2329,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[1,2,3,4,5,6,7] (Case 2)",
+        "input": "[1,2,3,4,5,6,7]",
         "expected": "2 -> 3 -> None, 4 -> 5 -> 6 -> 7 -> None"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[1,2,3,4,5,6,7]",
+        "expected": "2 -> 3 -> None, 4 -> 5 -> 6 -> 7 -> None"
       }
     ]
   },
@@ -2362,14 +2362,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[1,2,3,null,5,null,4] (Case 2)",
+        "input": "[1,2,3,null,5,null,4]",
         "expected": "[1,3,4]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "[0]",
-        "expected": "[]"
+        "input": "[1,2,3,null,5,null,4]",
+        "expected": "[1,3,4]"
       }
     ]
   },
@@ -2395,14 +2395,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[3,9,20,null,null,15,7] (Case 2)",
+        "input": "[3,9,20,null,null,15,7]",
         "expected": "[[15,7],[9,20],[3]]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "[0]",
-        "expected": "[]"
+        "input": "[3,9,20,null,null,15,7]",
+        "expected": "[[15,7],[9,20],[3]]"
       }
     ]
   },
@@ -2428,14 +2428,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "root = [5,4,8,11,null,13,4,7,2,null,null,null,1], targetSum = 22 (Case 2)",
+        "input": "root = [5,4,8,11,null,13,4,7,2,null,null,null,1], targetSum = 22",
         "expected": "True"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "root = [1], targetSum = 22",
-        "expected": "False"
+        "input": "root = [5,4,8,11,null,13,4,7,2,null,null,null,1], targetSum = 22",
+        "expected": "True"
       }
     ]
   },
@@ -2461,14 +2461,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "targetSum = 12 (Case 2)",
+        "input": "targetSum = 12",
         "expected": "[[1, 7, 4], [1, 9, 2]]"
       },
       {
         "id": 3,
         "name": "Case 3",
         "input": "targetSum = 12",
-        "expected": "[]"
+        "expected": "[[1, 7, 4], [1, 9, 2]]"
       }
     ]
   },
@@ -2494,14 +2494,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "root = [1, 2, 3] (Case 2)",
+        "input": "root = [1, 2, 3]",
         "expected": "25"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "root = [1, 2, 3]",
+        "expected": "25"
       }
     ]
   },
@@ -2527,14 +2527,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "sequence = [1, 9, 9] (Case 2)",
+        "input": "sequence = [1, 9, 9]",
         "expected": "True"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "sequence = [1]",
-        "expected": "False"
+        "input": "sequence = [1, 9, 9]",
+        "expected": "True"
       }
     ]
   },
@@ -2560,14 +2560,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "targetSum = 8 (Case 2)",
+        "input": "targetSum = 8",
         "expected": "3"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "targetSum = 8",
+        "expected": "3"
       }
     ]
   },
@@ -2593,14 +2593,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[1,2,3,4,5] (Case 2)",
+        "input": "[1,2,3,4,5]",
         "expected": "3"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[1,2,3,4,5]",
+        "expected": "3"
       }
     ]
   },
@@ -2626,14 +2626,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "root = [3,5,1,6,2,0,8], p = 5, q = 1 (Case 2)",
+        "input": "root = [3,5,1,6,2,0,8], p = 5, q = 1",
         "expected": "3"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "root = [3,5,1,6,2,0,8], p = 5, q = 1",
+        "expected": "3"
       }
     ]
   },
@@ -2659,14 +2659,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "root = [10,5,-3,3,2,null,11,3,-2,null,1], targetSum = 8 (Case 2)",
+        "input": "root = [10,5,-3,3,2,null,11,3,-2,null,1], targetSum = 8",
         "expected": "3"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "root = [10,5,-3,3,2,null,11,3,-2,null,1], targetSum = 8",
+        "expected": "3"
       }
     ]
   },
@@ -2692,14 +2692,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "root = [-10,9,20,null,null,15,7] (Case 2)",
+        "input": "root = [-10,9,20,null,null,15,7]",
         "expected": "42"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "root = [-10,9,20,null,null,15,7]",
+        "expected": "42"
       }
     ]
   },
@@ -2725,14 +2725,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "root = [1,2,3,null,null,4,5] (Case 2)",
+        "input": "root = [1,2,3,null,null,4,5]",
         "expected": "Same tree reconstructed"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "root = [1,2,3,null,null,4,5]",
+        "expected": "Same tree reconstructed"
       }
     ]
   },
@@ -2752,20 +2752,20 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 1,
         "name": "Case 1",
-        "input": "Standard sample for Find the Median of a Number Stream",
-        "expected": "Valid output"
+        "input": "Sample input",
+        "expected": "Expected result"
       },
       {
         "id": 2,
         "name": "Case 2",
-        "input": "Secondary sample for Find the Median of a Number Stream",
-        "expected": "Valid output"
+        "input": "Sample input",
+        "expected": "Expected result"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Edge boundary for Find the Median of a Number Stream",
-        "expected": "Default result"
+        "input": "Sample input",
+        "expected": "Expected result"
       }
     ]
   },
@@ -2791,14 +2791,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "nums = [1, 3, -1], k = 3",
+        "input": "nums = [1,3,-1,-3,5,3,6,7], k = 3",
         "expected": "[1.0,-1.0,-1.0,3.0,5.0,6.0]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "nums = [0], k = 3",
-        "expected": "[-1, -1]"
+        "input": "nums = [1,3,-1,-3,5,3,6,7], k = 3",
+        "expected": "[1.0,-1.0,-1.0,3.0,5.0,6.0]"
       }
     ]
   },
@@ -2824,14 +2824,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "k = 2, w = 0, profits = [1,2,3], capital = [0,1,1] (Case 2)",
+        "input": "k = 2, w = 0, profits = [1,2,3], capital = [0,1,1]",
         "expected": "4"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "k = 2, w = 0, profits = [1,2,3], capital = [0,1,1]",
+        "expected": "4"
       }
     ]
   },
@@ -2857,14 +2857,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[[2,3], [3,4], [5,6]] (Case 2)",
+        "input": "[[2,3], [3,4], [5,6]]",
         "expected": "[1, 2, -1]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "[0], [3,4], [5,6]]",
-        "expected": "[-1, -1]"
+        "input": "[[2,3], [3,4], [5,6]]",
+        "expected": "[1, 2, -1]"
       }
     ]
   },
@@ -2890,14 +2890,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "tasks = [\"A\",\"A\",\"A\",\"B\",\"B\",\"B\"], n = 2 (Case 2)",
+        "input": "tasks = [\"A\",\"A\",\"A\",\"B\",\"B\",\"B\"], n = 2",
         "expected": "8"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "tasks = [\"A\",\"A\",\"A\",\"B\",\"B\",\"B\"], n = 2",
+        "expected": "8"
       }
     ]
   },
@@ -2923,14 +2923,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[[0,30],[5,10],[15,20]] (Case 2)",
+        "input": "[[0,30],[5,10],[15,20]]",
         "expected": "2"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[[0,30],[5,10],[15,20]]",
+        "expected": "2"
       }
     ]
   },
@@ -2950,20 +2950,20 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 1,
         "name": "Case 1",
-        "input": "Standard sample for Kth Largest Element in a Stream",
-        "expected": "Valid output"
+        "input": "Sample input",
+        "expected": "Expected result"
       },
       {
         "id": 2,
         "name": "Case 2",
-        "input": "Secondary sample for Kth Largest Element in a Stream",
-        "expected": "Valid output"
+        "input": "Sample input",
+        "expected": "Expected result"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Edge boundary for Kth Largest Element in a Stream",
-        "expected": "Default result"
+        "input": "Sample input",
+        "expected": "Expected result"
       }
     ]
   },
@@ -2989,14 +2989,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "s = \"aabbcc\", k = 3 (Case 2)",
+        "input": "s = \"aabbcc\", k = 3",
         "expected": "\"abcabc\""
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "s = \"aabbcc\", k = 3",
+        "expected": "\"abcabc\""
       }
     ]
   },
@@ -3016,20 +3016,20 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 1,
         "name": "Case 1",
-        "input": "Standard sample for Maximum Frequency Stack",
-        "expected": "Valid output"
+        "input": "Sample input",
+        "expected": "Expected result"
       },
       {
         "id": 2,
         "name": "Case 2",
-        "input": "Secondary sample for Maximum Frequency Stack",
-        "expected": "Valid output"
+        "input": "Sample input",
+        "expected": "Expected result"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Edge boundary for Maximum Frequency Stack",
-        "expected": "Default result"
+        "input": "Sample input",
+        "expected": "Expected result"
       }
     ]
   },
@@ -3055,14 +3055,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "heightMap = [[1,4,3,1,3,2],[3,2,1,3,2,4],[2,3,3,2,3,1]] (Case 2)",
+        "input": "heightMap = [[1,4,3,1,3,2],[3,2,1,3,2,4],[2,3,3,2,3,1]]",
         "expected": "4"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "heightMap = [[1,4,3,1,3,2],[3,2,1,3,2,4],[2,3,3,2,3,1]]",
+        "expected": "4"
       }
     ]
   },
@@ -3088,14 +3088,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "nums = [1, 2, 3]",
+        "input": "nums = [1,2,3]",
         "expected": "[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "nums = [0]",
-        "expected": "[]"
+        "input": "nums = [1,2,3]",
+        "expected": "[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]"
       }
     ]
   },
@@ -3121,14 +3121,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "nums = [1, 2, 2]",
+        "input": "nums = [1,2,2]",
         "expected": "[[],[1],[1,2],[1,2,2],[2],[2,2]]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "nums = [0]",
-        "expected": "[]"
+        "input": "nums = [1,2,2]",
+        "expected": "[[],[1],[1,2],[1,2,2],[2],[2,2]]"
       }
     ]
   },
@@ -3154,14 +3154,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "nums = [1, 2, 3]",
+        "input": "nums = [1,2,3]",
         "expected": "[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "nums = [0]",
-        "expected": "[]"
+        "input": "nums = [1,2,3]",
+        "expected": "[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]"
       }
     ]
   },
@@ -3187,14 +3187,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "nums = [1, 1, 2]",
+        "input": "nums = [1,1,2]",
         "expected": "[[1,1,2],[1,2,1],[2,1,1]]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "nums = [0]",
-        "expected": "[]"
+        "input": "nums = [1,1,2]",
+        "expected": "[[1,1,2],[1,2,1],[2,1,1]]"
       }
     ]
   },
@@ -3220,14 +3220,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "candidates = [2,3,6,7], target = 7 (Case 2)",
+        "input": "candidates = [2,3,6,7], target = 7",
         "expected": "[[2,2,3],[7]]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "candidates = [0], target = 7",
-        "expected": "[]"
+        "input": "candidates = [2,3,6,7], target = 7",
+        "expected": "[[2,2,3],[7]]"
       }
     ]
   },
@@ -3253,14 +3253,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "candidates = [10,1,2,7,6,1,5], target = 8 (Case 2)",
+        "input": "candidates = [10,1,2,7,6,1,5], target = 8",
         "expected": "[[1,1,6],[1,2,5],[1,7],[2,6]]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "candidates = [0], target = 8",
-        "expected": "[]"
+        "input": "candidates = [10,1,2,7,6,1,5], target = 8",
+        "expected": "[[1,1,6],[1,2,5],[1,7],[2,6]]"
       }
     ]
   },
@@ -3286,14 +3286,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "s = \"a1b2\" (Case 2)",
+        "input": "s = \"a1b2\"",
         "expected": "[\"a1b2\", \"a1B2\", \"A1b2\", \"A1B2\"]"
       },
       {
         "id": 3,
         "name": "Case 3",
         "input": "s = \"a1b2\"",
-        "expected": "[]"
+        "expected": "[\"a1b2\", \"a1B2\", \"A1b2\", \"A1B2\"]"
       }
     ]
   },
@@ -3319,14 +3319,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "n = 3 (Case 2)",
+        "input": "n = 3",
         "expected": "[\"((()))\",\"(()())\",\"(())()\",\"()(())\",\"()()()\"]"
       },
       {
         "id": 3,
         "name": "Case 3",
         "input": "n = 3",
-        "expected": "[]"
+        "expected": "[\"((()))\",\"(()())\",\"(())()\",\"()(())\",\"()()()\"]"
       }
     ]
   },
@@ -3352,14 +3352,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "board = [[\"A\",\"B\",\"C\",\"E\"],[\"S\",\"F\",\"C\",\"S\"],[\"A\",\"D\",\"E\",\"E\"]], word = \"ABCCED\" (Case 2)",
+        "input": "board = [[\"A\",\"B\",\"C\",\"E\"],[\"S\",\"F\",\"C\",\"S\"],[\"A\",\"D\",\"E\",\"E\"]], word = \"ABCCED\"",
         "expected": "True"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "board = [1],[\"S\",\"F\",\"C\",\"S\"],[\"A\",\"D\",\"E\",\"E\"]], word = \"ABCCED\"",
-        "expected": "False"
+        "input": "board = [[\"A\",\"B\",\"C\",\"E\"],[\"S\",\"F\",\"C\",\"S\"],[\"A\",\"D\",\"E\",\"E\"]], word = \"ABCCED\"",
+        "expected": "True"
       }
     ]
   },
@@ -3385,14 +3385,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "n = 4 (Case 2)",
+        "input": "n = 4",
         "expected": "[[[col positions...]]]"
       },
       {
         "id": 3,
         "name": "Case 3",
         "input": "n = 4",
-        "expected": "[]"
+        "expected": "[[[col positions...]]]"
       }
     ]
   },
@@ -3418,13 +3418,13 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[4, 6, 10], key = 10 -> Output: 2 (Case 2)",
+        "input": "[4, 6, 10], key = 10 -> Output: 2",
         "expected": "0"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
+        "input": "[4, 6, 10], key = 10 -> Output: 2",
         "expected": "0"
       }
     ]
@@ -3451,14 +3451,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[4, 6, 10], key = 6 -> Output: 1 (Case 2)",
+        "input": "[4, 6, 10], key = 6 -> Output: 1",
         "expected": "4"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[4, 6, 10], key = 6 -> Output: 1",
+        "expected": "4"
       }
     ]
   },
@@ -3484,14 +3484,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "letters = ['a', 'c', 'f', 'h'], key = 'f' (Case 2)",
+        "input": "letters = ['a', 'c', 'f', 'h'], key = 'f'",
         "expected": "'h'"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "letters = ['a', 'c', 'f', 'h'], key = 'f'",
+        "expected": "'h'"
       }
     ]
   },
@@ -3517,14 +3517,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "nums = [5, 7, 7], target = 8",
+        "input": "nums = [5,7,7,8,8,10], target = 8",
         "expected": "[3, 4]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "nums = [0], target = 8",
-        "expected": "[]"
+        "input": "nums = [5,7,7,8,8,10], target = 8",
+        "expected": "[3, 4]"
       }
     ]
   },
@@ -3550,14 +3550,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30...], key = 16 (Case 2)",
+        "input": "[4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30...], key = 16",
         "expected": "6"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30...], key = 16",
+        "expected": "6"
       }
     ]
   },
@@ -3583,14 +3583,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[4, 6, 10], key = 7 -> Output: 6 (Case 2)",
+        "input": "[4, 6, 10], key = 7 -> Output: 6",
         "expected": "4"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[4, 6, 10], key = 7 -> Output: 6",
+        "expected": "4"
       }
     ]
   },
@@ -3616,14 +3616,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[1, 3, 8, 12, 4, 2], key = 4 (Case 2)",
+        "input": "[1, 3, 8, 12, 4, 2], key = 4",
         "expected": "4"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[1, 3, 8, 12, 4, 2], key = 4",
+        "expected": "4"
       }
     ]
   },
@@ -3649,14 +3649,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "nums = [4, 5, 6], target = 0",
+        "input": "nums = [4,5,6,7,0,1,2], target = 0",
         "expected": "4"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "nums = [4,5,6,7,0,1,2], target = 0",
+        "expected": "4"
       }
     ]
   },
@@ -3682,14 +3682,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "arr = [1, 2, 3], k = 4, x = 3",
+        "input": "arr = [1,2,3,4,5], k = 4, x = 3",
         "expected": "[1,2,3,4]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "arr = [0], k = 4, x = 3",
-        "expected": "[]"
+        "input": "arr = [1,2,3,4,5], k = 4, x = 3",
+        "expected": "[1,2,3,4]"
       }
     ]
   },
@@ -3715,14 +3715,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "nums1 = [1,3], nums2 = [2] (Case 2)",
+        "input": "nums1 = [1,3], nums2 = [2]",
         "expected": "2.0"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "nums1 = [1,3], nums2 = [2]",
+        "expected": "2.0"
       }
     ]
   },
@@ -3748,14 +3748,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[3, 1, 5, 12, 2, 11], K = 3 (Case 2)",
+        "input": "[3, 1, 5, 12, 2, 11], K = 3",
         "expected": "[5, 12, 11]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "[0], K = 3",
-        "expected": "[]"
+        "input": "[3, 1, 5, 12, 2, 11], K = 3",
+        "expected": "[5, 12, 11]"
       }
     ]
   },
@@ -3781,14 +3781,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[1, 5, 12, 2, 11, 5], K = 3 (Case 2)",
+        "input": "[1, 5, 12, 2, 11, 5], K = 3",
         "expected": "5"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[1, 5, 12, 2, 11, 5], K = 3",
+        "expected": "5"
       }
     ]
   },
@@ -3814,14 +3814,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "points = [[1,3],[-2,2]], k = 1 (Case 2)",
+        "input": "points = [[1,3],[-2,2]], k = 1",
         "expected": "[[-2,2]]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "points = [0],[-2,2]], k = 1",
-        "expected": "[]"
+        "input": "points = [[1,3],[-2,2]], k = 1",
+        "expected": "[[-2,2]]"
       }
     ]
   },
@@ -3847,14 +3847,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[1, 3, 11, 5] (Case 2)",
+        "input": "[1, 3, 11, 5]",
         "expected": "33"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[1, 3, 11, 5]",
+        "expected": "33"
       }
     ]
   },
@@ -3880,14 +3880,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "nums = [1, 1, 1], k = 2",
+        "input": "nums = [1,1,1,2,2,3], k = 2",
         "expected": "[1,2]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "nums = [0], k = 2",
-        "expected": "[]"
+        "input": "nums = [1,1,1,2,2,3], k = 2",
+        "expected": "[1,2]"
       }
     ]
   },
@@ -3913,14 +3913,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "\"tree\" -> (Case 2)",
+        "input": "\"tree\" ->",
         "expected": "\"eert\" or \"eetr\""
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "\"tree\" ->",
+        "expected": "\"eert\" or \"eetr\""
       }
     ]
   },
@@ -3940,20 +3940,20 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 1,
         "name": "Case 1",
-        "input": "Standard sample for Kth Largest Number in a Stream",
-        "expected": "Valid output"
+        "input": "Sample input",
+        "expected": "Expected result"
       },
       {
         "id": 2,
         "name": "Case 2",
-        "input": "Secondary sample for Kth Largest Number in a Stream",
-        "expected": "Valid output"
+        "input": "Sample input",
+        "expected": "Expected result"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Edge boundary for Kth Largest Number in a Stream",
-        "expected": "Default result"
+        "input": "Sample input",
+        "expected": "Expected result"
       }
     ]
   },
@@ -3979,14 +3979,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[5, 6, 7, 8, 9], K = 3, X = 7 (Case 2)",
+        "input": "[5, 6, 7, 8, 9], K = 3, X = 7",
         "expected": "[6, 7, 8]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "[0], K = 3, X = 7",
-        "expected": "[]"
+        "input": "[5, 6, 7, 8, 9], K = 3, X = 7",
+        "expected": "[6, 7, 8]"
       }
     ]
   },
@@ -4012,14 +4012,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[7, 3, 5, 8, 5, 3, 3], K = 2 (Case 2)",
+        "input": "[7, 3, 5, 8, 5, 3, 3], K = 2",
         "expected": "3"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[7, 3, 5, 8, 5, 3, 3], K = 2",
+        "expected": "3"
       }
     ]
   },
@@ -4045,14 +4045,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[1, 3, 12, 5, 15, 11], K1=3, K2=6 (Case 2)",
+        "input": "[1, 3, 12, 5, 15, 11], K1=3, K2=6",
         "expected": "23"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[1, 3, 12, 5, 15, 11], K1=3, K2=6",
+        "expected": "23"
       }
     ]
   },
@@ -4078,14 +4078,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "lists = [[1,4,5],[1,3,4],[2,6]] (Case 2)",
+        "input": "lists = [[1,4,5],[1,3,4],[2,6]]",
         "expected": "[1,1,2,3,4,4,5,6]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "lists = [0],[1,3,4],[2,6]]",
-        "expected": "[]"
+        "input": "lists = [[1,4,5],[1,3,4],[2,6]]",
+        "expected": "[1,1,2,3,4,4,5,6]"
       }
     ]
   },
@@ -4111,14 +4111,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "L1=[2, 6, 8], L2=[3, 6, 7], L3=[1, 3, 4], K=5 (Case 2)",
+        "input": "L1=[2, 6, 8], L2=[3, 6, 7], L3=[1, 3, 4], K=5",
         "expected": "4"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "L1=[2, 6, 8], L2=[3, 6, 7], L3=[1, 3, 4], K=5",
+        "expected": "4"
       }
     ]
   },
@@ -4144,14 +4144,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "matrix = [[1,5,9],[10,11,13],[12,13,15]], k = 8 (Case 2)",
+        "input": "matrix = [[1,5,9],[10,11,13],[12,13,15]], k = 8",
         "expected": "13"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "matrix = [[1,5,9],[10,11,13],[12,13,15]], k = 8",
+        "expected": "13"
       }
     ]
   },
@@ -4177,14 +4177,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[[4,10,15,24,26],[0,9,12,20],[5,18,22,30]] (Case 2)",
+        "input": "[[4,10,15,24,26],[0,9,12,20],[5,18,22,30]]",
         "expected": "[20, 24]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "[0],[0,9,12,20],[5,18,22,30]]",
-        "expected": "[]"
+        "input": "[[4,10,15,24,26],[0,9,12,20],[5,18,22,30]]",
+        "expected": "[20, 24]"
       }
     ]
   },
@@ -4210,14 +4210,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "nums1 = [9, 8, 2], nums2 = [6, 3, 1], K = 3 (Case 2)",
+        "input": "nums1 = [9, 8, 2], nums2 = [6, 3, 1], K = 3",
         "expected": "[[9, 6], [8, 6], [9, 3]]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "nums1 = [0], nums2 = [6, 3, 1], K = 3",
-        "expected": "[]"
+        "input": "nums1 = [9, 8, 2], nums2 = [6, 3, 1], K = 3",
+        "expected": "[[9, 6], [8, 6], [9, 3]]"
       }
     ]
   },
@@ -4243,14 +4243,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[[2, 6, 8], [3, 6, 7], [1, 3, 4]] (Case 2)",
+        "input": "[[2, 6, 8], [3, 6, 7], [1, 3, 4]]",
         "expected": "[1, 2, 3, 3, 4, 6, 6, 7, 8]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "[0], [3, 6, 7], [1, 3, 4]]",
-        "expected": "[]"
+        "input": "[[2, 6, 8], [3, 6, 7], [1, 3, 4]]",
+        "expected": "[1, 2, 3, 3, 4, 6, 6, 7, 8]"
       }
     ]
   },
@@ -4276,14 +4276,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "nums1 = [1,7,11], nums2 = [2,4,6], k = 3 (Case 2)",
+        "input": "nums1 = [1,7,11], nums2 = [2,4,6], k = 3",
         "expected": "[[1,2],[1,4],[1,6]]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "nums1 = [0], nums2 = [2,4,6], k = 3",
-        "expected": "[]"
+        "input": "nums1 = [1,7,11], nums2 = [2,4,6], k = 3",
+        "expected": "[[1,2],[1,4],[1,6]]"
       }
     ]
   },
@@ -4309,14 +4309,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "root = [3,1,4,null,2], k = 1 (Case 2)",
+        "input": "root = [3,1,4,null,2], k = 1",
         "expected": "1"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "root = [3,1,4,null,2], k = 1",
+        "expected": "1"
       }
     ]
   },
@@ -4342,14 +4342,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[[1, 3, 5], [2, 4, 6]] (Case 2)",
+        "input": "[[1, 3, 5], [2, 4, 6]]",
         "expected": "3.5"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "[[1, 3, 5], [2, 4, 6]]",
+        "expected": "3.5"
       }
     ]
   },
@@ -4375,14 +4375,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "[[1,2,3,4],[2,4,6],[1,2,4,5]] (Case 2)",
+        "input": "[[1,2,3,4],[2,4,6],[1,2,4,5]]",
         "expected": "[2, 4]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "[0],[2,4,6],[1,2,4,5]]",
-        "expected": "[]"
+        "input": "[[1,2,3,4],[2,4,6],[1,2,4,5]]",
+        "expected": "[2, 4]"
       }
     ]
   },
@@ -4402,20 +4402,20 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 1,
         "name": "Case 1",
-        "input": "Standard sample for 0/1 Knapsack",
-        "expected": "Valid output"
+        "input": "Sample input",
+        "expected": "Expected result"
       },
       {
         "id": 2,
         "name": "Case 2",
-        "input": "Secondary sample for 0/1 Knapsack",
-        "expected": "Valid output"
+        "input": "Sample input",
+        "expected": "Expected result"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Edge boundary for 0/1 Knapsack",
-        "expected": "Default result"
+        "input": "Sample input",
+        "expected": "Expected result"
       }
     ]
   },
@@ -4441,14 +4441,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "nums = [1, 5, 11]",
+        "input": "nums = [1, 5, 11, 5]",
         "expected": "True"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "nums = [1]",
-        "expected": "False"
+        "input": "nums = [1, 5, 11, 5]",
+        "expected": "True"
       }
     ]
   },
@@ -4474,14 +4474,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "nums = [1, 2, 3], target = 6",
+        "input": "nums = [1, 2, 3, 7], target = 6",
         "expected": "True"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "nums = [1], target = 6",
-        "expected": "False"
+        "input": "nums = [1, 2, 3, 7], target = 6",
+        "expected": "True"
       }
     ]
   },
@@ -4507,14 +4507,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "nums = [1, 2, 3]",
+        "input": "nums = [1, 2, 3, 9]",
         "expected": "3"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "nums = [1, 2, 3, 9]",
+        "expected": "3"
       }
     ]
   },
@@ -4540,14 +4540,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "nums = [1, 1, 2], target = 4",
+        "input": "nums = [1, 1, 2, 3], target = 4",
         "expected": "3"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "nums = [1, 1, 2, 3], target = 4",
+        "expected": "3"
       }
     ]
   },
@@ -4573,14 +4573,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "nums = [1, 1, 1], target = 3",
+        "input": "nums = [1, 1, 1, 1, 1], target = 3",
         "expected": "5"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "nums = [1, 1, 1, 1, 1], target = 3",
+        "expected": "5"
       }
     ]
   },
@@ -4600,20 +4600,20 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 1,
         "name": "Case 1",
-        "input": "Standard sample for Unbounded Knapsack (Rod Cutting)",
-        "expected": "Valid output"
+        "input": "Sample input",
+        "expected": "Expected result"
       },
       {
         "id": 2,
         "name": "Case 2",
-        "input": "Secondary sample for Unbounded Knapsack (Rod Cutting)",
-        "expected": "Valid output"
+        "input": "Sample input",
+        "expected": "Expected result"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Edge boundary for Unbounded Knapsack (Rod Cutting)",
-        "expected": "Default result"
+        "input": "Sample input",
+        "expected": "Expected result"
       }
     ]
   },
@@ -4639,14 +4639,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "coins = [1,2,5], amount = 11 (Case 2)",
+        "input": "coins = [1,2,5], amount = 11",
         "expected": "3"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "coins = [1,2,5], amount = 11",
+        "expected": "3"
       }
     ]
   },
@@ -4672,14 +4672,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "amount = 5, coins = [1,2,5] (Case 2)",
+        "input": "amount = 5, coins = [1,2,5]",
         "expected": "4"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "amount = 5, coins = [1,2,5]",
+        "expected": "4"
       }
     ]
   },
@@ -4705,14 +4705,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "text1 = \"abcde\", text2 = \"ace\" (Case 2)",
+        "input": "text1 = \"abcde\", text2 = \"ace\"",
         "expected": "3"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "text1 = \"abcde\", text2 = \"ace\"",
+        "expected": "3"
       }
     ]
   },
@@ -4738,14 +4738,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "grid = [[\"1\",\"1\",\"0\"],[\"1\",\"1\",\"0\"],[\"0\",\"0\",\"1\"]] (Case 2)",
+        "input": "grid = [[\"1\",\"1\",\"0\"],[\"1\",\"1\",\"0\"],[\"0\",\"0\",\"1\"]]",
         "expected": "2"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "grid = [[\"1\",\"1\",\"0\"],[\"1\",\"1\",\"0\"],[\"0\",\"0\",\"1\"]]",
+        "expected": "2"
       }
     ]
   },
@@ -4771,14 +4771,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "adjList = [[2,4],[1,3],[2,4],[1,3]] (Case 2)",
+        "input": "adjList = [[2,4],[1,3],[2,4],[1,3]]",
         "expected": "Cloned graph"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "adjList = [[2,4],[1,3],[2,4],[1,3]]",
+        "expected": "Cloned graph"
       }
     ]
   },
@@ -4804,14 +4804,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "numCourses = 2, prerequisites = [[1,0],[0,1]]",
-        "expected": "False"
+        "input": "numCourses = 2, prerequisites = [[1,0]]",
+        "expected": "True"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "numCourses = 2, prerequisites = []]",
-        "expected": "0"
+        "input": "numCourses = 2, prerequisites = [[1,0]]",
+        "expected": "True"
       }
     ]
   },
@@ -4837,14 +4837,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "numCourses = 4, prerequisites = [[1,0],[2,0],[3,1],[3,2]] (Case 2)",
+        "input": "numCourses = 4, prerequisites = [[1,0],[2,0],[3,1],[3,2]]",
         "expected": "[0,2,1,3] or [0,1,2,3]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "numCourses = 4, prerequisites = [0],[2,0],[3,1],[3,2]]",
-        "expected": "[]"
+        "input": "numCourses = 4, prerequisites = [[1,0],[2,0],[3,1],[3,2]]",
+        "expected": "[0,2,1,3] or [0,1,2,3]"
       }
     ]
   },
@@ -4870,14 +4870,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "n = 5, edges = [[0,1],[1,2],[3,4]] (Case 2)",
+        "input": "n = 5, edges = [[0,1],[1,2],[3,4]]",
         "expected": "2"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "n = 5, edges = [[0,1],[1,2],[3,4]]",
+        "expected": "2"
       }
     ]
   },
@@ -4903,14 +4903,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "n = 5, edges = [[0,1],[0,2],[0,3],[1,4]] (Case 2)",
+        "input": "n = 5, edges = [[0,1],[0,2],[0,3],[1,4]]",
         "expected": "True"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "n = 5, edges = [1],[0,2],[0,3],[1,4]]",
-        "expected": "False"
+        "input": "n = 5, edges = [[0,1],[0,2],[0,3],[1,4]]",
+        "expected": "True"
       }
     ]
   },
@@ -4936,14 +4936,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "edges = [[1,2],[1,3],[2,3]] (Case 2)",
+        "input": "edges = [[1,2],[1,3],[2,3]]",
         "expected": "[2,3]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "edges = [0],[1,3],[2,3]]",
-        "expected": "[]"
+        "input": "edges = [[1,2],[1,3],[2,3]]",
+        "expected": "[2,3]"
       }
     ]
   },
@@ -4969,14 +4969,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "beginWord = \"hit\", endWord = \"cog\", wordList = [\"hot\",\"dot\",\"dog\",\"lot\",\"log\",\"cog\"] (Case 2)",
+        "input": "beginWord = \"hit\", endWord = \"cog\", wordList = [\"hot\",\"dot\",\"dog\",\"lot\",\"log\",\"cog\"]",
         "expected": "5"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "beginWord = \"hit\", endWord = \"cog\", wordList = [\"hot\",\"dot\",\"dog\",\"lot\",\"log\",\"cog\"]",
+        "expected": "5"
       }
     ]
   },
@@ -5002,14 +5002,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "grid = [[2,1,1],[1,1,0],[0,1,1]] (Case 2)",
+        "input": "grid = [[2,1,1],[1,1,0],[0,1,1]]",
         "expected": "4"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "Empty or minimal boundary case",
-        "expected": "0"
+        "input": "grid = [[2,1,1],[1,1,0],[0,1,1]]",
+        "expected": "4"
       }
     ]
   },
@@ -5035,14 +5035,14 @@ window.LEETCODE_PROBLEMS = [
       {
         "id": 2,
         "name": "Case 2",
-        "input": "n = 4, edges = [[0,1,1],[1,2,2],[0,2,4],[2,3,1]], source = 0 (Case 2)",
+        "input": "n = 4, edges = [[0,1,1],[1,2,2],[0,2,4],[2,3,1]], source = 0",
         "expected": "[0, 1, 3, 4]"
       },
       {
         "id": 3,
         "name": "Case 3",
-        "input": "n = 4, edges = [0],[1,2,2],[0,2,4],[2,3,1]], source = 0",
-        "expected": "[]"
+        "input": "n = 4, edges = [[0,1,1],[1,2,2],[0,2,4],[2,3,1]], source = 0",
+        "expected": "[0, 1, 3, 4]"
       }
     ]
   }
