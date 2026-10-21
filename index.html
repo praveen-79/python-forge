@@ -380,6 +380,9 @@
           <button id="nav-skills" onclick="navigateTo('skills')" class="btn-ghost" style="border-radius: 20px; border: none;">
             <span>🧪</span> Forge Lab <span style="background: #ef4444; color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 10px; font-weight: 800; margin-left: 2px;">NEW</span>
           </button>
+          <button id="nav-leetcode" onclick="navigateTo('leetcode')" class="btn-ghost" style="border-radius: 20px; border: none;">
+            <span>🧩</span> LeetCode 150
+          </button>
         </nav>
       </div>
 
@@ -425,6 +428,10 @@
   <main id="app-container" style="flex: 1; display: flex; flex-direction: column;">
     <!-- Rendered dynamically -->
   </main>
+
+  <!-- LEETCODE 150 DATA & WORKSPACE ENGINE -->
+  <script src="leetcode150_data.js"></script>
+  <script src="leetcode150_ui.js"></script>
 
   <!-- CORE SCRIPT & FULL 7-DAY CONTENT ENGINE -->
   <script>
@@ -555,6 +562,7 @@
       activeSeconds: parseInt(localStorage.getItem('forge_time')) || 252,
       lastInteractionTime: Date.now(),
       solvedQuests: new Set(JSON.parse(localStorage.getItem('forge_solved') || '["d1-l1", "d1-l2"]')),
+      leetcodeCompleted: new Set(JSON.parse(localStorage.getItem('forge_leetcode_completed') || '[]')),
       hintStep: 0, // 0: hidden, 1: small hint, 2: strong hint, 3: solution
       editorCode: '',
       terminalOutput: '',
@@ -2302,7 +2310,7 @@
       state.currentView = view;
       const container = document.getElementById('app-container');
 
-      ['quests', 'dashboard', 'projects', 'review', 'skills'].forEach(id => {
+      ['quests', 'dashboard', 'projects', 'review', 'skills', 'leetcode'].forEach(id => {
         const btn = document.getElementById(`nav-${id}`);
         if (btn) {
           if ((view === 'workspace' && id === 'quests') || view === id) {
@@ -2323,6 +2331,9 @@
       else if (view === 'projects') renderProjects(container);
       else if (view === 'review') renderReviewRoom(container);
       else if (view === 'skills') renderSkillMap(container);
+      else if (view === 'leetcode') {
+        if (typeof renderLeetCodeWorkspace === 'function') renderLeetCodeWorkspace(container);
+      }
     }
 
     // ==========================================
