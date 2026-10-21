@@ -671,92 +671,196 @@
     `;
   }
 
-  // PYTHON AUTO-INDENTATION AFTER COLON & KEY EVENT HANDLER
-  window.handleLcEditorKeydown = function(e) {
+  // Helper to insert or replace text while preserving the native browser Undo/Redo stack (Ctrl+Z / Ctrl+Y)
+  function insertTextPreservingUndo(textarea, text, replaceStart, replaceEnd) {
+    textarea.focus();
+    if (typeof replaceStart === 'number' && typeof replaceEnd === 'number') {
+      textarea.setSelectionRange(replaceStart, replaceEnd);
+    }
+
+    let success = false;
+    try {
+      success = document.execCommand('insertText', false, text);
+    } catch (err) {
+      success = false;
+    }
+
+    if (!success) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      if (typeof textarea.setRangeText === 'function') {
+        textarea.setRangeText(text, start, end, 'end');
+      } else {
+        const val = textarea.value;
+        textarea.value = val.substring(0, start) + text + val.substring(end);
+        textarea.selectionStart = textarea.selectionEnd = start + text.length;
+      }
+    }
+
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  // Unified Language-Aware Indentation & Keyboard Engine
+  window.handleSmartEditorKeydown = function(e, onRunCallback, onInputCallback) {
     const ta = e.target;
     const start = ta.selectionStart;
     const end = ta.selectionEnd;
     const val = ta.value;
 
-    // 1. Ctrl + Enter to run tests
+    // 1. Run shortcut: Ctrl + Enter or Cmd + Enter
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault();
-      runLcCode();
+      if (typeof onRunCallback === 'function') onRunCallback();
       return;
     }
 
-    // 2. Enter key: Auto-indentation after colon (':')
+    // 2. Enter key: Language-Aware Smart Indentation
     if (e.key === 'Enter') {
       e.preventDefault();
       const lineStart = val.lastIndexOf('\n', start - 1) + 1;
-      const currentLine = val.substring(lineStart, start);
-      const indentMatch = currentLine.match(/^(\s*)/);
-      let indent = indentMatch ? indentMatch[1] : '';
+      const lineBeforeCursor = val.substring(lineStart, start);
+      const indentMatch = lineBeforeCursor.match(/^(\s*)/);
+      const currentIndent = indentMatch ? indentMatch[1] : '';
 
-      // Check if current line ends with a colon (ignoring comments and trailing space)
-      const cleanLine = currentLine.replace(/#.*$/, '').trimEnd();
-      if (cleanLine.endsWith(':')) {
-        indent += '    '; // Add 4 spaces of indentation
+      // Strip comments and trailing spaces
+      const cleanLine = lineBeforeCursor.replace(/#.*$/, '').trim();
+
+      let nextIndent = currentIndent;
+
+      // Block starter: ends with ':' (Python) or '{' (C++, Java, JS)
+      if (cleanLine.endsWith(':') || cleanLine.endsWith('{')) {
+        nextIndent = currentIndent + '    '; // Indent one level (+4 spaces)
+      }
+      // Block terminator: return, pass, break, continue, raise
+      // Sensibly dedent by one level (-4 spaces, down to 0)
+      else if (/^(return(\s+.*)?|pass|break|continue|raise(\s+.*)?)$/.test(cleanLine)) {
+        if (currentIndent.length >= 4) {
+          nextIndent = currentIndent.substring(4);
+        } else {
+          nextIndent = '';
+        }
+      }
+      // Curly bracket closer '}'
+      else if (cleanLine.endsWith('}')) {
+        if (currentIndent.length >= 4) {
+          nextIndent = currentIndent.substring(4);
+        } else {
+          nextIndent = '';
+        }
       }
 
-      const insertion = '\n' + indent;
-      ta.value = val.substring(0, start) + insertion + val.substring(end);
-      ta.selectionStart = ta.selectionEnd = start + insertion.length;
-      handleLcEditorInput(ta.value);
+      insertTextPreservingUndo(ta, '\n' + nextIndent, start, end);
+      if (typeof onInputCallback === 'function') onInputCallback(ta.value || ta);
       return;
     }
 
-    // 3. Tab key: Indent 4 spaces
-    if (e.key === 'Tab' && !e.shiftKey) {
+    // 3. Tab key: Indentation & Multi-line Support
+    if (e.key === 'Tab') {
       e.preventDefault();
-      const insertion = '    ';
-      ta.value = val.substring(0, start) + insertion + val.substring(end);
-      ta.selectionStart = ta.selectionEnd = start + 4;
-      handleLcEditorInput(ta.value);
-      return;
-    }
+      const isShift = e.shiftKey;
 
-    // 4. Shift + Tab: Unindent 4 spaces
-    if (e.key === 'Tab' && e.shiftKey) {
-      e.preventDefault();
-      const lineStart = val.lastIndexOf('\n', start - 1) + 1;
-      if (val.substring(lineStart, lineStart + 4) === '    ') {
-        ta.value = val.substring(0, lineStart) + val.substring(lineStart + 4);
-        ta.selectionStart = ta.selectionEnd = Math.max(lineStart, start - 4);
-        handleLcEditorInput(ta.value);
+      // Multi-line selection: indent/unindent all selected lines
+      if (start !== end && val.substring(start, end).includes('\n')) {
+        const lineStart = val.lastIndexOf('\n', start - 1) + 1;
+        const lineEndIdx = val.indexOf('\n', end);
+        const lineEnd = lineEndIdx === -1 ? val.length : lineEndIdx;
+
+        const selectedBlock = val.substring(lineStart, lineEnd);
+        const lines = selectedBlock.split('\n');
+
+        let startOffset = 0;
+        let endOffset = 0;
+        let newLines;
+
+        if (!isShift) {
+          newLines = lines.map((l, i) => {
+            if (l.length > 0 || lines.length === 1) {
+              if (i === 0) startOffset += 4;
+              endOffset += 4;
+              return '    ' + l;
+            }
+            return l;
+          });
+        } else {
+          newLines = lines.map((l, i) => {
+            const match = l.match(/^( {1,4})/);
+            if (match) {
+              const removed = match[1].length;
+              if (i === 0) startOffset -= removed;
+              endOffset -= removed;
+              return l.substring(removed);
+            }
+            return l;
+          });
+        }
+
+        const replacement = newLines.join('\n');
+        insertTextPreservingUndo(ta, replacement, lineStart, lineEnd);
+        ta.setSelectionRange(Math.max(lineStart, start + startOffset), Math.max(lineStart, end + endOffset));
+        if (typeof onInputCallback === 'function') onInputCallback(ta.value || ta);
+        return;
       }
+
+      // Single line or no selection
+      if (!isShift) {
+        insertTextPreservingUndo(ta, '    ', start, end);
+      } else {
+        const lineStart = val.lastIndexOf('\n', start - 1) + 1;
+        const match = val.substring(lineStart, lineStart + 4).match(/^( {1,4})/);
+        if (match) {
+          const removed = match[1].length;
+          insertTextPreservingUndo(ta, '', lineStart, lineStart + removed);
+          ta.setSelectionRange(Math.max(lineStart, start - removed), Math.max(lineStart, end - removed));
+        }
+      }
+      if (typeof onInputCallback === 'function') onInputCallback(ta.value || ta);
       return;
     }
 
-    // 5. Backspace: Unindent 4 spaces if preceded by 4 spaces
+    // 4. Backspace: Dedent 4 spaces when at indent boundary
     if (e.key === 'Backspace' && start === end) {
       const lineStart = val.lastIndexOf('\n', start - 1) + 1;
       const beforeCursor = val.substring(lineStart, start);
-      if (/^\s+$/.test(beforeCursor) && beforeCursor.length % 4 === 0 && beforeCursor.length >= 4) {
+      if (/^\s+$/.test(beforeCursor) && beforeCursor.length >= 1) {
+        const countToDelete = beforeCursor.length % 4 === 0 ? 4 : (beforeCursor.length % 4);
         e.preventDefault();
-        ta.value = val.substring(0, start - 4) + val.substring(end);
-        ta.selectionStart = ta.selectionEnd = start - 4;
-        handleLcEditorInput(ta.value);
+        insertTextPreservingUndo(ta, '', start - countToDelete, start);
+        if (typeof onInputCallback === 'function') onInputCallback(ta.value || ta);
         return;
       }
     }
 
-    // 6. Auto-closing pairs: (), [], {}, "", ''
+    // 5. Auto-closing pairs: (), [], {}, "", ''
     const pairs = { '(': ')', '[': ']', '{': '}', '"': '"', "'": "'" };
-    if (pairs[e.key] && start === end) {
-      const nextChar = val[start];
-      if ((e.key === '"' || e.key === "'") && nextChar === e.key) {
+    if (pairs[e.key]) {
+      const closing = pairs[e.key];
+      if (start !== end) {
+        // Wrap selection
         e.preventDefault();
-        ta.selectionStart = ta.selectionEnd = start + 1;
+        const selected = val.substring(start, end);
+        insertTextPreservingUndo(ta, e.key + selected + closing, start, end);
+        ta.setSelectionRange(start + 1, end + 1);
+        if (typeof onInputCallback === 'function') onInputCallback(ta.value || ta);
+        return;
+      } else {
+        const nextChar = val[start];
+        if ((e.key === '"' || e.key === "'" || e.key === ')' || e.key === ']' || e.key === '}') && nextChar === e.key) {
+          e.preventDefault();
+          ta.setSelectionRange(start + 1, start + 1);
+          return;
+        }
+        e.preventDefault();
+        insertTextPreservingUndo(ta, e.key + closing, start, end);
+        ta.setSelectionRange(start + 1, start + 1);
+        if (typeof onInputCallback === 'function') onInputCallback(ta.value || ta);
         return;
       }
-      e.preventDefault();
-      const closing = pairs[e.key];
-      ta.value = val.substring(0, start) + e.key + closing + val.substring(end);
-      ta.selectionStart = ta.selectionEnd = start + 1;
-      handleLcEditorInput(ta.value);
-      return;
     }
+  };
+
+  // PYTHON AUTO-INDENTATION AFTER COLON & KEY EVENT HANDLER
+  window.handleLcEditorKeydown = function(e) {
+    window.handleSmartEditorKeydown(e, window.runLcCode, window.handleLcEditorInput);
   };
 
   // Format Python code (cleanup spacing)

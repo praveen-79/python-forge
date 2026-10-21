@@ -2914,7 +2914,7 @@
                   <div class="line-numbers" id="line-numbers">
                     1<br>2<br>3<br>4<br>5<br>6<br>7<br>8
                   </div>
-                  <textarea id="python-editor" class="code-editor-area" spellcheck="false" oninput="handleCodeInput(this)">${state.editorCode}</textarea>
+                  <textarea id="python-editor" class="code-editor-area" spellcheck="false" oninput="handleCodeInput(this)" onkeydown="handlePythonEditorKeydown(event)">${state.editorCode}</textarea>
                 </div>
 
                 <!-- Footer Navigation Bar -->
@@ -3437,6 +3437,12 @@
         draftPill.style.color = 'var(--lime)';
       }
       updateLineNumbers();
+    }
+
+    function handlePythonEditorKeydown(e) {
+      if (typeof window.handleSmartEditorKeydown === 'function') {
+        window.handleSmartEditorKeydown(e, runPythonCode, handleCodeInput);
+      }
     }
 
     function updateLineNumbers() {
