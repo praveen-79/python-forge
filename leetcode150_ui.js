@@ -1872,21 +1872,37 @@ ${escapeHtml(prob.solution)}
   };
 
   // ==============================================================
-  // GENUINE PYTHON EXECUTION & TESTCASE VERIFICATION ENGINE
+  // GENUINE PYTHON EXECUTION & TESTCASE VERIFICATION ENGINE (SKULPT)
   // ==============================================================
 
-  function parseInputAssignments(str) {
-    if (!str) return { args: [], namedArgs: {} };
+  function pyLiteral(val) {
+    if (val === null || val === undefined) return 'None';
+    if (typeof val === 'boolean') return val ? 'True' : 'False';
+    if (typeof val === 'string') return JSON.stringify(val);
+    if (typeof val === 'number') return String(val);
+    if (Array.isArray(val)) {
+      return '[' + val.map(pyLiteral).join(', ') + ']';
+    }
+    if (typeof val === 'object') {
+      const items = Object.entries(val).map(([k, v]) => `${JSON.stringify(k)}: ${pyLiteral(v)}`);
+      return '{' + items.join(', ') + '}';
+    }
+    return String(val);
+  }
+
+  function parseAndAlignArgs(inputStr, formalParams) {
+    if (!inputStr || !inputStr.trim()) return [];
+
     const parts = [];
     let cur = '';
     let depth = 0;
     let inQuote = null;
 
-    for (let i = 0; i < str.length; i++) {
-      const ch = str[i];
+    for (let i = 0; i < inputStr.length; i++) {
+      const ch = inputStr[i];
       if (inQuote) {
         cur += ch;
-        if (ch === inQuote && str[i - 1] !== '\\') inQuote = null;
+        if (ch === inQuote && inputStr[i - 1] !== '\\') inQuote = null;
       } else {
         if (ch === '"' || ch === "'") {
           inQuote = ch;
@@ -1907,12 +1923,13 @@ ${escapeHtml(prob.solution)}
     }
     if (cur.trim()) parts.push(cur.trim());
 
-    const args = [];
     const namedArgs = {};
+    const unassigned = [];
+
     for (const part of parts) {
       const eqIdx = part.indexOf('=');
       if (eqIdx !== -1) {
-        const varName = part.substring(0, eqIdx).trim();
+        const key = part.substring(0, eqIdx).trim().toLowerCase();
         const valStr = part.substring(eqIdx + 1).trim();
         let val;
         try {
@@ -1920,8 +1937,7 @@ ${escapeHtml(prob.solution)}
         } catch (e) {
           val = valStr;
         }
-        args.push(val);
-        namedArgs[varName] = val;
+        namedArgs[key] = val;
       } else {
         let val;
         try {
@@ -1929,326 +1945,118 @@ ${escapeHtml(prob.solution)}
         } catch (e) {
           val = part;
         }
-        args.push(val);
+        unassigned.push(val);
       }
     }
-    return { args, namedArgs };
-  }
 
-  function validatePythonSyntax(code) {
-    const lines = code.split('\n');
+    if (formalParams && formalParams.length > 0) {
+      const alignedArgs = new Array(formalParams.length).fill(undefined);
+      const usedFormalIndices = new Set();
 
-    let paren = 0, bracket = 0, brace = 0;
-    for (let i = 0; i < code.length; i++) {
-      const c = code[i];
-      if (c === '(') paren++;
-      else if (c === ')') paren--;
-      else if (c === '[') bracket++;
-      else if (c === ']') bracket--;
-      else if (c === '{') brace++;
-      else if (c === '}') brace--;
-    }
-    if (paren !== 0) return { valid: false, error: "SyntaxError: unbalanced parentheses '(' and ')'" };
-    if (bracket !== 0) return { valid: false, error: "SyntaxError: unbalanced brackets '[' and ']'" };
-    if (brace !== 0) return { valid: false, error: "SyntaxError: unbalanced curly braces '{' and '}'" };
-
-    for (let i = 0; i < lines.length; i++) {
-      const lineNum = i + 1;
-      const raw = lines[i];
-      const trimmed = raw.trim();
-      if (!trimmed || trimmed.startsWith('#')) continue;
-
-      const noComment = trimmed.replace(/#.*$/, '').trim();
-
-      const headerMatch = noComment.match(/^(def|class|if|elif|else|while|for|try|except|finally|with)\b/);
-      if (headerMatch) {
-        if (!noComment.endsWith(':')) {
-          return {
-            valid: false,
-            error: `SyntaxError: expected ':' at line ${lineNum}: "${trimmed}"`
-          };
-        }
-
-        const condKeyword = headerMatch[1];
-        if (['if', 'elif', 'while'].includes(condKeyword)) {
-          const cond = noComment.substring(condKeyword.length, noComment.length - 1).trim();
-          const singleEqRegex = /(?<![<>=!:])=(?![=~:])/;
-          if (singleEqRegex.test(cond)) {
-            return {
-              valid: false,
-              error: `SyntaxError: invalid syntax (assignment '=' used in conditional expression) at line ${lineNum}: "${trimmed}". Did you mean '=='?`
-            };
+      // 1. Match named arguments by key
+      formalParams.forEach((param, pIdx) => {
+        const pLower = param.toLowerCase();
+        for (const [key, val] of Object.entries(namedArgs)) {
+          if (key === pLower || key.startsWith(pLower) || pLower.startsWith(key) || (pLower === 's' && key === 'string') || (pLower === 'arr' && key === 'nums')) {
+            alignedArgs[pIdx] = val;
+            usedFormalIndices.add(pIdx);
+            delete namedArgs[key];
+            break;
           }
         }
+      });
+
+      // 2. Unassigned values fill empty parameter slots
+      for (let pIdx = 0; pIdx < formalParams.length; pIdx++) {
+        if (!usedFormalIndices.has(pIdx) && unassigned.length > 0) {
+          alignedArgs[pIdx] = unassigned.shift();
+          usedFormalIndices.add(pIdx);
+        }
+      }
+
+      // 3. Remaining named args fill remaining slots
+      const remainingNamed = Object.values(namedArgs);
+      for (let pIdx = 0; pIdx < formalParams.length; pIdx++) {
+        if (!usedFormalIndices.has(pIdx) && remainingNamed.length > 0) {
+          alignedArgs[pIdx] = remainingNamed.shift();
+          usedFormalIndices.add(pIdx);
+        }
+      }
+
+      while (unassigned.length > 0) {
+        alignedArgs.push(unassigned.shift());
+      }
+
+      return alignedArgs;
+    }
+
+    return [...unassigned, ...Object.values(namedArgs)];
+  }
+
+  function comparePythonOutputs(actual, expected) {
+    if (actual === expected) return true;
+    let expVal = expected;
+    if (typeof expected === 'string') {
+      const trimmed = expected.trim();
+      if (trimmed === 'True') expVal = true;
+      else if (trimmed === 'False') expVal = false;
+      else if (trimmed === 'None') expVal = null;
+      else if (/^-?\d+(\.\d+)?$/.test(trimmed)) expVal = Number(trimmed);
+      else if ((trimmed.startsWith('[') && trimmed.endsWith(']')) || (trimmed.startsWith('{') && trimmed.endsWith('}'))) {
+        try {
+          expVal = JSON.parse(trimmed.replace(/'/g, '"').replace(/\bTrue\b/g, 'true').replace(/\bFalse\b/g, 'false').replace(/\bNone\b/g, 'null'));
+        } catch (e) {
+          expVal = trimmed;
+        }
+      } else if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+        expVal = trimmed.slice(1, -1);
       }
     }
 
-    return { valid: true };
-  }
+    // Numbers: integer and float equivalence (9.0 === 9)
+    if (typeof actual === 'number' && typeof expVal === 'number') {
+      return Math.abs(actual - expVal) < 1e-6;
+    }
 
-  function transpilePythonToJS(code) {
-    const lines = code.split('\n');
-    let jsLines = [];
-    let funcName = null;
-    let funcParams = [];
-    const indentStack = [];
+    // Booleans
+    if (typeof actual === 'boolean' && typeof expVal === 'boolean') {
+      return actual === expVal;
+    }
 
-    jsLines.push('let _loopCounter = 0;');
-    jsLines.push('const MAX_STEPS = 50000;');
+    // Null / None
+    if (actual === null && expVal === null) {
+      return true;
+    }
 
-    for (let i = 0; i < lines.length; i++) {
-      let rawLine = lines[i];
-      const indentMatch = rawLine.match(/^(\s*)/);
-      const curIndent = indentMatch ? indentMatch[1].length : 0;
-      let t = rawLine.trim();
-
-      if (!t || t.startsWith('#')) continue;
-
-      const commentIdx = t.indexOf('#');
-      if (commentIdx !== -1) t = t.substring(0, commentIdx).trim();
-
-      const isElif = t.startsWith('elif ') || t.startsWith('elif:');
-      const isElse = t === 'else:' || t.startsWith('else:');
-
-      while (indentStack.length > 0 && curIndent <= indentStack[indentStack.length - 1]) {
-        if ((isElif || isElse) && curIndent === indentStack[indentStack.length - 1]) {
-          indentStack.pop();
+    // Arrays / Lists
+    if (Array.isArray(actual) && Array.isArray(expVal)) {
+      if (actual.length !== expVal.length) return false;
+      let allMatch = true;
+      for (let i = 0; i < actual.length; i++) {
+        if (!comparePythonOutputs(actual[i], expVal[i])) {
+          allMatch = false;
           break;
         }
-        indentStack.pop();
-        jsLines.push(' '.repeat(curIndent) + '}');
       }
+      if (allMatch) return true;
 
-      const indentStr = ' '.repeat(curIndent);
-
-      const defMatch = t.match(/^def\s+([a-zA-Z0-9_]+)\s*\((.*?)\)\s*:$/);
-      if (defMatch) {
-        funcName = defMatch[1];
-        funcParams = defMatch[2].split(',').map(p => p.trim().split(':')[0].split('=')[0].trim()).filter(Boolean);
-        jsLines.push(`${indentStr}function ${funcName}(${funcParams.join(', ')}) {`);
-        indentStack.push(curIndent);
-        continue;
+      // Sorted match fallback (e.g. 3Sum triplets or anagram indices)
+      const sortKey = (x) => JSON.stringify(Array.isArray(x) ? [...x].sort() : x);
+      try {
+        const sortedActual = [...actual].sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
+        const sortedExp = [...expVal].sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
+        return JSON.stringify(sortedActual) === JSON.stringify(sortedExp);
+      } catch (e) {
+        return false;
       }
-
-      const whileMatch = t.match(/^while\s+(.*?)\s*:$/);
-      if (whileMatch) {
-        const cond = convertPythonExpr(whileMatch[1]);
-        jsLines.push(`${indentStr}while (${cond}) {`);
-        jsLines.push(`${indentStr}  if (++_loopCounter > MAX_STEPS) throw new Error("Time Limit Exceeded: Loop exceeded maximum execution limit (50,000 steps). Infinite loop detected.");`);
-        indentStack.push(curIndent);
-        continue;
-      }
-
-      const forRangeMatch = t.match(/^for\s+([a-zA-Z0-9_]+)\s+in\s+range\((.*?)\)\s*:$/);
-      if (forRangeMatch) {
-        const varName = forRangeMatch[1];
-        const rangeArgs = forRangeMatch[2].split(',').map(a => convertPythonExpr(a.trim()));
-        let start = '0', stop = rangeArgs[0], step = '1';
-        if (rangeArgs.length === 2) {
-          start = rangeArgs[0];
-          stop = rangeArgs[1];
-        } else if (rangeArgs.length === 3) {
-          start = rangeArgs[0];
-          stop = rangeArgs[1];
-          step = rangeArgs[2];
-        }
-        jsLines.push(`${indentStr}for (let ${varName} = ${start}; ${varName} < ${stop}; ${varName} += ${step}) {`);
-        jsLines.push(`${indentStr}  if (++_loopCounter > MAX_STEPS) throw new Error("Time Limit Exceeded: Loop exceeded maximum execution limit (50,000 steps)");`);
-        indentStack.push(curIndent);
-        continue;
-      }
-
-      const forInMatch = t.match(/^for\s+([a-zA-Z0-9_]+)\s+in\s+(.*?)\s*:$/);
-      if (forInMatch) {
-        const varName = forInMatch[1];
-        const iter = convertPythonExpr(forInMatch[2]);
-        jsLines.push(`${indentStr}for (let ${varName} of ${iter}) {`);
-        jsLines.push(`${indentStr}  if (++_loopCounter > MAX_STEPS) throw new Error("Time Limit Exceeded: Loop exceeded maximum execution limit (50,000 steps)");`);
-        indentStack.push(curIndent);
-        continue;
-      }
-
-      const ifMatch = t.match(/^if\s+(.*?)\s*:$/);
-      if (ifMatch) {
-        const cond = convertPythonExpr(ifMatch[1]);
-        jsLines.push(`${indentStr}if (${cond}) {`);
-        indentStack.push(curIndent);
-        continue;
-      }
-
-      const elifMatch = t.match(/^elif\s+(.*?)\s*:$/);
-      if (elifMatch) {
-        const cond = convertPythonExpr(elifMatch[1]);
-        jsLines.push(`${indentStr}} else if (${cond}) {`);
-        indentStack.push(curIndent);
-        continue;
-      }
-
-      const elseMatch = t.match(/^else\s*:$/);
-      if (elseMatch) {
-        jsLines.push(`${indentStr}} else {`);
-        indentStack.push(curIndent);
-        continue;
-      }
-
-      const retMatch = t.match(/^return(\s+(.*))?$/);
-      if (retMatch) {
-        const val = retMatch[2] ? convertPythonExpr(retMatch[2].trim()) : 'null';
-        jsLines.push(`${indentStr}return ${val};`);
-        continue;
-      }
-
-      if (t === 'pass') {
-        jsLines.push(`${indentStr}/* pass */`);
-        continue;
-      }
-
-      if (t === 'break' || t === 'continue') {
-        jsLines.push(`${indentStr}${t};`);
-        continue;
-      }
-
-      // Multiple assignment: left, right = 0, len(arr) - 1
-      const multiAssign = t.match(/^([a-zA-Z0-9_,\s]+)\s*=\s*(.+)$/);
-      if (multiAssign && multiAssign[1].includes(',')) {
-        const vars = multiAssign[1].split(',').map(v => v.trim());
-        const expr = multiAssign[2].trim();
-        const values = splitTopLevelCommas(expr).map(e => convertPythonExpr(e.trim()));
-        if (vars.length === values.length) {
-          const decls = `[${vars.join(', ')}] = [${values.join(', ')}]`;
-          jsLines.push(`${indentStr}var ${decls};`);
-          continue;
-        }
-      }
-
-      const assignMatch = t.match(/^([a-zA-Z0-9_]+)\s*(\+=|-=|\*=|\/=|%=|=)\s*(.+)$/);
-      if (assignMatch) {
-        const varName = assignMatch[1];
-        const op = assignMatch[2];
-        const val = convertPythonExpr(assignMatch[3]);
-        if (op === '=') {
-          jsLines.push(`${indentStr}var ${varName} = ${val};`);
-        } else {
-          jsLines.push(`${indentStr}${varName} ${op} ${val};`);
-        }
-        continue;
-      }
-
-      const indexedAssign = t.match(/^([a-zA-Z0-9_]+)\[(.*?)\]\s*=\s*(.+)$/);
-      if (indexedAssign) {
-        const arrName = indexedAssign[1];
-        const idxExpr = convertPythonExpr(indexedAssign[2]);
-        const valExpr = convertPythonExpr(indexedAssign[3]);
-        jsLines.push(`${indentStr}_safeSet(${arrName}, ${idxExpr}, ${valExpr});`);
-        continue;
-      }
-
-      const methodCall = t.match(/^([a-zA-Z0-9_]+)\.(append|pop|reverse|sort)\((.*?)\)$/);
-      if (methodCall) {
-        const obj = methodCall[1];
-        const meth = methodCall[2];
-        const args = methodCall[3] ? convertPythonExpr(methodCall[3]) : '';
-        if (meth === 'append') jsLines.push(`${indentStr}${obj}.push(${args});`);
-        else if (meth === 'pop') jsLines.push(`${indentStr}${obj}.pop(${args});`);
-        else if (meth === 'reverse') jsLines.push(`${indentStr}${obj}.reverse();`);
-        else if (meth === 'sort') jsLines.push(`${indentStr}${obj}.sort((a,b)=>a-b);`);
-        continue;
-      }
-
-      jsLines.push(`${indentStr}${convertPythonExpr(t)};`);
     }
 
-    while (indentStack.length > 0) {
-      indentStack.pop();
-      jsLines.push('}');
+    // Strings
+    if (typeof actual === 'string' && typeof expVal === 'string') {
+      return actual.trim().replace(/^['"]|['"]$/g, '') === expVal.trim().replace(/^['"]|['"]$/g, '');
     }
 
-    return {
-      js: jsLines.join('\n'),
-      funcName,
-      funcParams
-    };
-  }
-
-  function splitTopLevelCommas(str) {
-    const parts = [];
-    let cur = '';
-    let depth = 0;
-    for (let i = 0; i < str.length; i++) {
-      const c = str[i];
-      if (c === '(' || c === '[' || c === '{') depth++;
-      else if (c === ')' || c === ']' || c === '}') depth--;
-      else if (c === ',' && depth === 0) {
-        parts.push(cur.trim());
-        cur = '';
-        continue;
-      }
-      cur += c;
-    }
-    if (cur.trim()) parts.push(cur.trim());
-    return parts;
-  }
-
-  function convertPythonExpr(expr) {
-    if (!expr) return '';
-    let res = expr;
-
-    res = res.replace(/\(([a-zA-Z0-9_,\s\+\-\*\/\.]+)\)/g, (match, inner) => {
-      if (inner.includes(',')) return `[${inner}]`;
-      return match;
-    });
-
-    res = res.replace(/\blen\((.*?)\)/g, '($1).length');
-    res = res.replace(/([a-zA-Z0-9_\.\[\]]+)\s*\/\/\s*([a-zA-Z0-9_\.\[\]]+)/g, 'Math.floor(($1) / ($2))');
-    res = res.replace(/\band\b/g, '&&');
-    res = res.replace(/\bor\b/g, '||');
-    res = res.replace(/\bnot\b/g, '!');
-    res = res.replace(/\bTrue\b/g, 'true');
-    res = res.replace(/\bFalse\b/g, 'false');
-    res = res.replace(/\bNone\b/g, 'null');
-    res = res.replace(/([a-zA-Z0-9_]+)\[([^:\]]+)\]/g, '_safeGet($1, $2)');
-    res = res.replace(/\bmin\(/g, 'Math.min(');
-    res = res.replace(/\bmax\(/g, 'Math.max(');
-    res = res.replace(/\babs\(/g, 'Math.abs(');
-    res = res.replace(/float\(['"]inf['"]\)/g, 'Infinity');
-    res = res.replace(/float\(['"]-inf['"]\)/g, '-Infinity');
-
-    return res;
-  }
-
-  function _safeGet(arr, idx) {
-    if (arr == null) throw new Error("TypeError: object is not subscriptable");
-    if (typeof arr === 'string' || Array.isArray(arr)) {
-      let actualIdx = idx;
-      if (idx < 0) actualIdx = arr.length + idx;
-      if (actualIdx < 0 || actualIdx >= arr.length) {
-        throw new Error(`IndexError: list index out of range (index ${idx} for list of length ${arr.length})`);
-      }
-      return arr[actualIdx];
-    }
-    if (typeof arr === 'object') {
-      if (!(idx in arr)) throw new Error(`KeyError: ${JSON.stringify(idx)}`);
-      return arr[idx];
-    }
-    return arr[idx];
-  }
-
-  function _safeSet(arr, idx, val) {
-    if (arr == null) throw new Error("TypeError: object is not subscriptable");
-    if (Array.isArray(arr)) {
-      let actualIdx = idx;
-      if (idx < 0) actualIdx = arr.length + idx;
-      if (actualIdx < 0 || actualIdx >= arr.length) {
-        throw new Error(`IndexError: list assignment index out of range`);
-      }
-      arr[actualIdx] = val;
-      return;
-    }
-    if (typeof arr === 'object') {
-      arr[idx] = val;
-      return;
-    }
-    arr[idx] = val;
+    return String(actual).trim().replace(/\s+/g, ' ').replace(/'/g, '"') === String(expected).trim().replace(/\s+/g, ' ').replace(/'/g, '"');
   }
 
   function formatPythonValue(val) {
@@ -2261,15 +2069,7 @@ ${escapeHtml(prob.solution)}
     return String(val);
   }
 
-  function normalizeExpected(str) {
-    if (!str) return '';
-    return str.trim()
-      .replace(/\s+/g, ' ')
-      .replace(/'/g, '"')
-      .replace(/,\s+/g, ', ');
-  }
-
-  function executePythonSubmission(code, testCases) {
+  function executePythonSubmission(code, prob, testCases) {
     const startTime = Date.now();
     const trimmed = code.trim();
 
@@ -2280,136 +2080,194 @@ ${escapeHtml(prob.solution)}
         passed: false,
         status: 'Incomplete',
         error: "NotImplementedError: function body is empty or contains 'pass'. Please implement your logic before running tests.",
-        runtime: 6,
+        runtime: 4,
         passedCount: `0/${testCases.length}`,
         cases: testCases.map((c, idx) => ({ id: c.id || (idx + 1), name: c.name || `Case ${idx + 1}`, passed: false, input: c.input, actual: 'None', expected: c.expected }))
       };
     }
 
-    // 2. Syntax validation
-    const syn = validatePythonSyntax(trimmed);
-    if (!syn.valid) {
+    const starterMatch = prob.starterCode.match(/def\s+([a-zA-Z0-9_]+)\s*\((.*?)\)/);
+    const expectedFuncName = starterMatch ? starterMatch[1] : null;
+    const formalParams = starterMatch ? starterMatch[2].split(',').map(x => x.trim().split(':')[0].split('=')[0].trim()).filter(Boolean) : [];
+
+    let targetFuncName = expectedFuncName;
+    if (expectedFuncName && !code.includes(`def ${expectedFuncName}`)) {
+      const userFuncMatch = code.match(/def\s+([a-zA-Z0-9_]+)\s*\(/);
+      if (userFuncMatch) targetFuncName = userFuncMatch[1];
+    }
+
+    if (!targetFuncName) {
       return {
         passed: false,
         status: 'Syntax Error',
-        error: syn.error,
+        error: "SyntaxError: No function definition found. Make sure your code starts with 'def ...':",
         runtime: 4,
         passedCount: `0/${testCases.length}`,
         cases: testCases.map((c, idx) => ({ id: c.id || (idx + 1), name: c.name || `Case ${idx + 1}`, passed: false, input: c.input, actual: 'SyntaxError', expected: c.expected }))
       };
     }
 
-    // 3. Transpilation
-    let transpiled;
-    try {
-      transpiled = transpilePythonToJS(trimmed);
-    } catch (err) {
-      return {
-        passed: false,
-        status: 'Syntax Error',
-        error: `SyntaxError in Python logic: ${err.message}`,
-        runtime: 5,
-        passedCount: `0/${testCases.length}`,
-        cases: testCases.map((c, idx) => ({ id: c.id || (idx + 1), name: c.name || `Case ${idx + 1}`, passed: false, input: c.input, actual: 'SyntaxError', expected: c.expected }))
-      };
-    }
+    const Sk = (typeof window !== 'undefined' && window.Sk) ? window.Sk : null;
 
-    const funcName = transpiled.funcName;
-    if (!funcName) {
-      return {
-        passed: false,
-        status: 'Syntax Error',
-        error: "SyntaxError: No function definition found. Make sure your code starts with 'def function_name(...):'.",
-        runtime: 4,
-        passedCount: `0/${testCases.length}`,
-        cases: testCases.map((c, idx) => ({ id: c.id || (idx + 1), name: c.name || `Case ${idx + 1}`, passed: false, input: c.input, actual: 'SyntaxError', expected: c.expected }))
-      };
-    }
-
-    // 4. Execution against test cases
-    const caseResults = [];
-    let numPassed = 0;
-    let firstFailureStatus = null;
-    let firstFailureError = null;
-
-    for (let i = 0; i < testCases.length; i++) {
-      const tc = testCases[i];
-      const parsed = parseInputAssignments(tc.input);
-
-      let runnerFn;
-      try {
-        runnerFn = new Function('_safeGet', '_safeSet', transpiled.js + `\nreturn ${funcName};`);
-      } catch (parseErr) {
-        return {
-          passed: false,
-          status: 'Syntax Error',
-          error: `SyntaxError: ${parseErr.message}`,
-          runtime: 6,
-          passedCount: `0/${testCases.length}`,
-          cases: testCases.map((c, idx) => ({ id: c.id || (idx + 1), name: c.name || `Case ${idx + 1}`, passed: false, input: c.input, actual: 'SyntaxError', expected: c.expected }))
-        };
+    if (Sk) {
+      function builtinRead(x) {
+        if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined) {
+          throw new Error("File not found: '" + x + "'");
+        }
+        return Sk.builtinFiles["files"][x];
       }
 
-      try {
-        const fn = runnerFn(_safeGet, _safeSet);
-        const result = fn.apply(null, parsed.args);
-        const actualFormatted = formatPythonValue(result);
-        const isMatch = normalizeExpected(actualFormatted) === normalizeExpected(tc.expected);
+      Sk.configure({
+        read: builtinRead,
+        __future__: Sk.python3,
+        execLimit: 2000
+      });
 
-        if (isMatch) {
-          numPassed++;
-          caseResults.push({
-            id: tc.id || (i + 1),
-            name: tc.name || `Case ${i + 1}`,
-            passed: true,
-            input: tc.input,
-            actual: actualFormatted,
-            expected: tc.expected
-          });
-        } else {
-          if (!firstFailureStatus) firstFailureStatus = 'Wrong Answer';
+      const helperHeader = `
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+def _to_list_node(arr):
+    if not arr: return None
+    head = ListNode(arr[0])
+    curr = head
+    for x in arr[1:]:
+        curr.next = ListNode(x)
+        curr = curr.next
+    return head
+
+def _from_list_node(head):
+    res = []
+    curr = head
+    seen = set()
+    while curr and curr not in seen:
+        seen.add(curr)
+        res.append(curr.val)
+        curr = curr.next
+    return res
+`;
+
+      const headerLineCount = helperHeader.split('\n').length;
+      const caseResults = [];
+      let numPassed = 0;
+      let firstFailureStatus = null;
+      let firstFailureError = null;
+
+      for (let i = 0; i < testCases.length; i++) {
+        const tc = testCases[i];
+        const alignedArgs = parseAndAlignArgs(tc.input, formalParams);
+
+        const pyArgsList = alignedArgs.map((arg, aIdx) => {
+          const pName = formalParams[aIdx] || '';
+          if (Array.isArray(arg) && (pName === 'head' || prob.title.toLowerCase().includes('linkedlist') || prob.title.toLowerCase().includes('linked list'))) {
+            return `_to_list_node(${pyLiteral(arg)})`;
+          }
+          return pyLiteral(arg);
+        });
+
+        const runnerScript = `
+${helperHeader}
+
+# User Code
+${code}
+
+# Test Invocation
+__raw_result__ = ${targetFuncName}(${pyArgsList.join(', ')})
+if isinstance(__raw_result__, ListNode):
+    __final_result__ = _from_list_node(__raw_result__)
+else:
+    __final_result__ = __raw_result__
+`;
+
+        try {
+          const mod = Sk.importMainWithBody('<stdin>', false, runnerScript, true);
+          const rawResult = mod.$d.__final_result__;
+          const actualJs = (rawResult !== undefined) ? Sk.ffi.remapToJs(rawResult) : null;
+
+          const isMatch = comparePythonOutputs(actualJs, tc.expected);
+          const formattedActual = formatPythonValue(actualJs);
+
+          if (isMatch) {
+            numPassed++;
+            caseResults.push({
+              id: tc.id || (i + 1),
+              name: tc.name || `Case ${i + 1}`,
+              passed: true,
+              input: tc.input,
+              actual: formattedActual,
+              expected: tc.expected
+            });
+          } else {
+            if (!firstFailureStatus) firstFailureStatus = 'Wrong Answer';
+            caseResults.push({
+              id: tc.id || (i + 1),
+              name: tc.name || `Case ${i + 1}`,
+              passed: false,
+              input: tc.input,
+              actual: formattedActual,
+              expected: tc.expected
+            });
+          }
+        } catch (err) {
+          let errMsg = err.toString();
+          let caseStatus = 'Runtime Error';
+          if (err.tp$name === 'SyntaxError' || errMsg.includes('SyntaxError')) {
+            caseStatus = 'Syntax Error';
+          } else if (err.tp$name === 'TimeLimitError' || errMsg.includes('TimeLimitError') || errMsg.includes('time limit')) {
+            caseStatus = 'Time Limit Exceeded';
+            errMsg = 'Time Limit Exceeded: Execution exceeded 2.0s limit (infinite loop detected).';
+          } else if (err.tp$name) {
+            errMsg = `${err.tp$name}: ${err.args ? err.args.v[0]?.v : err.toString()}`;
+          }
+
+          // Adjust line numbers so they match the learner's editor line numbers
+          errMsg = errMsg.replace(/line (\d+)/g, (m, l) => 'line ' + Math.max(1, parseInt(l) - headerLineCount + 1));
+
+          if (!firstFailureStatus) {
+            firstFailureStatus = caseStatus;
+            firstFailureError = errMsg;
+          }
+
           caseResults.push({
             id: tc.id || (i + 1),
             name: tc.name || `Case ${i + 1}`,
             passed: false,
             input: tc.input,
-            actual: actualFormatted,
-            expected: tc.expected
+            actual: errMsg,
+            expected: tc.expected,
+            error: errMsg
           });
         }
-      } catch (execErr) {
-        const errMsg = execErr.message || String(execErr);
-        let caseStatus = 'Runtime Error';
-        if (errMsg.includes('Time Limit Exceeded')) caseStatus = 'Time Limit Exceeded';
-        else if (errMsg.includes('IndexError')) caseStatus = 'Runtime Error';
-
-        if (!firstFailureStatus) {
-          firstFailureStatus = caseStatus;
-          firstFailureError = errMsg;
-        }
-
-        caseResults.push({
-          id: tc.id || (i + 1),
-          name: tc.name || `Case ${i + 1}`,
-          passed: false,
-          input: tc.input,
-          actual: errMsg,
-          expected: tc.expected,
-          error: errMsg
-        });
       }
+
+      const elapsed = Math.max(Date.now() - startTime, 18);
+      const allPassed = numPassed === testCases.length;
+
+      return {
+        passed: allPassed,
+        status: allPassed ? 'Accepted' : (firstFailureStatus || 'Wrong Answer'),
+        runtime: elapsed,
+        passedCount: `${numPassed}/${testCases.length}`,
+        error: firstFailureError,
+        cases: caseResults
+      };
     }
 
-    const elapsed = Math.max(Date.now() - startTime, 18);
-    const allPassed = numPassed === testCases.length;
-
     return {
-      passed: allPassed,
-      status: allPassed ? 'Accepted' : (firstFailureStatus || 'Wrong Answer'),
-      runtime: elapsed,
-      passedCount: `${numPassed}/${testCases.length}`,
-      error: firstFailureError,
-      cases: caseResults
+      passed: false,
+      status: 'Environment Error',
+      error: "Python runtime (Skulpt) is initializing. Please try running again in a moment.",
+      runtime: 1,
+      passedCount: `0/${testCases.length}`,
+      cases: testCases.map((c, idx) => ({ id: c.id || (idx + 1), name: c.name || `Case ${idx + 1}`, passed: false, input: c.input, actual: 'Runtime not ready', expected: c.expected }))
     };
   }
 
@@ -2431,7 +2289,7 @@ ${escapeHtml(prob.solution)}
     ];
 
     // Execute through our genuine Python evaluation engine
-    const results = executePythonSubmission(code, cases);
+    const results = executePythonSubmission(code, prob, cases);
     lc.testResults = results;
 
     // Automatically focus on the first failed test case if any failed

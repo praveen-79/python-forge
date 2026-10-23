@@ -430,6 +430,8 @@
   </main>
 
   <!-- LEETCODE 150 DATA & WORKSPACE ENGINE -->
+  <script src="scripts/vendor/skulpt.min.js"></script>
+  <script src="scripts/vendor/skulpt-stdlib.js"></script>
   <script src="leetcode150_data.js"></script>
   <script src="leetcode150_ui.js"></script>
 
@@ -3536,10 +3538,9 @@
     // ==========================================
     // PARSER & PYTHON SIMULATOR
     // ==========================================
+    // PYTHON CODE EXECUTION ENGINE
+    // ==========================================
     function executePythonLocally(code) {
-      let output = '';
-      const lines = code.split('\n');
-
       // Intentional error traps for Bug Hunt
       if (code.includes('range(1, "6")') || (code.includes('limit = "6"') && code.includes('range(1, limit)'))) {
         return {
@@ -3556,7 +3557,39 @@
         };
       }
 
+      // Execute with real Python runtime (Skulpt) if loaded
+      if (typeof window !== 'undefined' && window.Sk) {
+        let stdout = '';
+        try {
+          window.Sk.configure({
+            output: (text) => { stdout += text; },
+            read: (x) => {
+              if (window.Sk.builtinFiles === undefined || window.Sk.builtinFiles["files"][x] === undefined) {
+                throw new Error("File not found: '" + x + "'");
+              }
+              return window.Sk.builtinFiles["files"][x];
+            },
+            __future__: window.Sk.python3,
+            execLimit: 2000
+          });
+          window.Sk.importMainWithBody("<stdin>", false, code, true);
+          return { success: true, output: stdout || 'Program executed with no stdout.\n' };
+        } catch (err) {
+          let msg = err.toString();
+          if (err.tp$name) {
+            msg = `${err.tp$name}: ${err.args ? err.args.v[0]?.v : err.toString()}`;
+          }
+          return {
+            success: false,
+            error: msg,
+            hint: `Traceback details: ${msg}`
+          };
+        }
+      }
+
       try {
+        let output = '';
+        const lines = code.split('\n');
         const env = {};
 
         for (let i = 0; i < lines.length; i++) {
